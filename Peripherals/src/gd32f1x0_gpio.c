@@ -62,68 +62,68 @@ void GPIO_DeInit(GPIO_TypeDef* GPIOx)
 /**
   * @brief  Initialize the GPIOx peripheral.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_InitParaStruct: The structuer contains configuration information.
+  * @param  GPIO_InitTypeDefStruct: The structuer contains configuration information.
   * @retval None
   */
-void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitPara* GPIO_InitParaStruct)
+void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitTypeDefStruct)
 {
     uint32_t pin = 0x00;
 
     for (pin = 0x00; pin < 0x10; pin++)
     {
-        if(((GPIO_InitParaStruct->GPIO_Pin) & (((uint32_t)0x01) << pin))!=0)
+        if(((GPIO_InitTypeDefStruct->Pin) & (((uint32_t)0x01) << pin))!=0)
         {
-            if ((GPIO_InitParaStruct->GPIO_Mode == GPIO_MODE_OUT) || (GPIO_InitParaStruct->GPIO_Mode == GPIO_MODE_AF))
+            if ((GPIO_InitTypeDefStruct->Mode == GPIO_MODE_OUT) || (GPIO_InitTypeDefStruct->Mode == GPIO_MODE_AF))
             {
                 /* Speed configuration */
                 GPIOx->OSPD &= ~(GPIO_OSPD_OSPD0 << (pin * 2));
-                GPIOx->OSPD |= ((uint32_t)(GPIO_InitParaStruct->GPIO_Speed) << (pin * 2));
+                GPIOx->OSPD |= ((uint32_t)(GPIO_InitTypeDefStruct->Speed) << (pin * 2));
 
                 /* Output type configuration */
                 GPIOx->OMODE &= ~((GPIO_OMODE_OM0) << ((uint16_t)pin));
-                GPIOx->OMODE |= (uint16_t)(((uint16_t)GPIO_InitParaStruct->GPIO_OType) << ((uint16_t)pin));
+                GPIOx->OMODE |= (uint16_t)(((uint16_t)GPIO_InitTypeDefStruct->GPIO_OType) << ((uint16_t)pin));
             }
 
             /* Pull-up Pull-down configuration */
             GPIOx->PUPD &= ~(GPIO_PUPD_PUPD0 << ((uint16_t)pin * 2));
-            GPIOx->PUPD |= (((uint32_t)GPIO_InitParaStruct->GPIO_PuPd) << (pin * 2));
+            GPIOx->PUPD |= (((uint32_t)GPIO_InitTypeDefStruct->Pull) << (pin * 2));
             
             /* GPIO mode configuration */
             GPIOx->CTLR  &= ~(GPIO_CTLR_CTLR0 << (pin * 2));
-            GPIOx->CTLR |= (((uint32_t)GPIO_InitParaStruct->GPIO_Mode) << (pin * 2));
+            GPIOx->CTLR |= (((uint32_t)GPIO_InitTypeDefStruct->Mode) << (pin * 2));
         }
     }
 }
 
 /**
-  * @brief  Initial GPIO_InitParameter members.
-  * @param  GPIO_InitParaStruct : pointer to a GPIO_InitPara structure.
+  * @brief  Initial GPIO_InitTypeDefmeter members.
+  * @param  GPIO_InitTypeDefStruct : pointer to a GPIO_InitTypeDef structure.
   * @retval None
   */
-void GPIO_ParaInit(GPIO_InitPara* GPIO_InitParaStruct)
+void GPIO_ParaInit(GPIO_InitTypeDef* GPIO_InitTypeDefStruct)
 {
     /* Reset GPIO init structure parameters values */
-    GPIO_InitParaStruct->GPIO_Pin   = GPIO_PIN_ALL;
-    GPIO_InitParaStruct->GPIO_Mode  = GPIO_MODE_IN;
-    GPIO_InitParaStruct->GPIO_Speed = GPIO_SPEED_2MHZ;
-    GPIO_InitParaStruct->GPIO_OType = GPIO_OTYPE_PP;
-    GPIO_InitParaStruct->GPIO_PuPd  = GPIO_PUPD_NOPULL;
+    GPIO_InitTypeDefStruct->Pin   = GPIO_PIN_ALL;
+    GPIO_InitTypeDefStruct->Mode  = GPIO_MODE_IN;
+    GPIO_InitTypeDefStruct->Speed = GPIO_SPEED_2MHZ;
+    GPIO_InitTypeDefStruct->GPIO_OType = GPIO_OTYPE_PP;
+    GPIO_InitTypeDefStruct->Pull  = GPIO_PUPD_NOPULL;
 }
 
 /**
   * @brief  Lock GPIO Pins configuration.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @retval None
   */
-void GPIO_PinLock(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+void HAL_GPIO_LockPin(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
     __IO uint32_t temp_lock = 0x00010000;
 
-    temp_lock |= GPIO_Pin;
+    temp_lock |= Pin;
     /* Lock key writing sequence*/
     GPIOx->LOCKR = temp_lock;
-    GPIOx->LOCKR =  GPIO_Pin;
+    GPIOx->LOCKR =  Pin;
     GPIOx->LOCKR = temp_lock;
     temp_lock = GPIOx->LOCKR;
     temp_lock = GPIOx->LOCKR;
@@ -132,12 +132,12 @@ void GPIO_PinLock(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 /**
   * @brief  Read the select input port.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @retval The input port pin value.
   */
-uint8_t GPIO_ReadInputBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+uint8_t GPIO_ReadInputBit(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
-    if ((GPIOx->DIR & GPIO_Pin) != (uint32_t)Bit_RESET)
+    if ((GPIOx->DIR & Pin) != (uint32_t)Bit_RESET)
     {
         return (uint8_t)Bit_SET;
     }
@@ -160,12 +160,12 @@ uint16_t GPIO_ReadInputData(GPIO_TypeDef* GPIOx)
 /**
   * @brief  Read the specified output data port bit.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @retval The output port pin value.
   */
-uint8_t GPIO_ReadOutputBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+uint8_t GPIO_ReadOutputBit(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
-    if ((GPIOx->DOR & GPIO_Pin) != (uint32_t)Bit_RESET)
+    if ((GPIOx->DOR & Pin) != (uint32_t)Bit_RESET)
     {
         return (uint8_t)Bit_SET;
     }
@@ -188,44 +188,58 @@ uint16_t GPIO_ReadOutputData(GPIO_TypeDef* GPIOx)
 /**
   * @brief  Set the selected data port bits.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @retval None
   */
-void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
-    GPIOx->BOR = GPIO_Pin;
+    GPIOx->BOR = Pin;
 }
 
 /**
   * @brief  Clear the selected data port bits.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @retval None
   */
-void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
-    GPIOx->BCR = GPIO_Pin;
+    GPIOx->BCR = Pin;
 }
 
 /**
   * @brief  Set or clear the selected data port bit.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @param  BitVal: specifies the state of the port.Select one of the follwing values :
   *     @arg Bit_RESET: clear the port pin
   *     @arg Bit_SET: set the port pin
   * @retval None
   */
-void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitState BitVal)
+void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t Pin, GPIO_PinState BitVal)
 {
     if (BitVal != Bit_RESET)
     {
-        GPIOx->BOR = GPIO_Pin;
+        GPIOx->BOR = Pin;
     }
     else
     {
-        GPIOx->BCR = GPIO_Pin;
+        GPIOx->BCR = Pin;
     }
+}
+
+/**
+  * @brief  Toggle the selected data port bit.
+  * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
+  * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
+  * @param  BitVal: specifies the state of the port.Select one of the follwing values :
+  *     @arg Bit_RESET: clear the port pin
+  *     @arg Bit_SET: set the port pin
+  * @retval None
+  */
+void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+{
+      GPIOx->ODR ^= Pin;
 }
 
 /**
@@ -242,7 +256,7 @@ void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal)
 /**
   * @brief  Write data to the specified GPIO data port.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
-  * @param  GPIO_PinSource: This parameter can be GPIO_PINSOURCEx where x can be (0..15).
+  * @param  PinSource: This parameter can be GPIO_PINSOURCEx where x can be (0..15).
   * @param  GPIO_AF: selects the pin to used as Alternate function. This parameter can be GPIO_AF_x where x can be 0 to 7.\
              This parameter can be one of the following value:
   *            @arg GPIO_AF_0: EVENTOUT, TIMER15, SPI1, I2S1, TIMER17,MCO, SWDAT, SWCLK, TIMER14,
@@ -256,15 +270,44 @@ void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal)
   *            @arg GPIO_AF_7: COMP1_OUT, COMP2_OUT 
   * @retval None
   */ 
-void GPIO_PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t GPIO_PinSource, uint8_t GPIO_AF)
+void PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t PinSource, uint8_t GPIO_AF)
 {
     uint32_t temp = 0x00;
     uint32_t temp_2 = 0x00;
 
-    temp = ((uint32_t)(GPIO_AF) << ((uint32_t)((uint32_t)GPIO_PinSource & (uint32_t)0x07) * 4));
-    GPIOx->AFS[GPIO_PinSource >> 0x03] &= ~((uint32_t)0xF << ((uint32_t)((uint32_t)GPIO_PinSource & (uint32_t)0x07) * 4));
-    temp_2 = GPIOx->AFS[GPIO_PinSource >> 0x03] | temp;
-    GPIOx->AFS[GPIO_PinSource >> 0x03] = temp_2;
+    temp = ((uint32_t)(GPIO_AF) << ((uint32_t)((uint32_t)PinSource & (uint32_t)0x07) * 4));
+    GPIOx->AFS[PinSource >> 0x03] &= ~((uint32_t)0xF << ((uint32_t)((uint32_t)PinSource & (uint32_t)0x07) * 4));
+    temp_2 = GPIOx->AFS[PinSource >> 0x03] | temp;
+    GPIOx->AFS[PinSource >> 0x03] = temp_2;
+}
+
+/**
+  * @brief  This function handles EXTI interrupt request.
+  * @param  GPIO_Pin: Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
+{
+  /* EXTI line interrupt detected */
+  if(__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != RESET)
+  {
+    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
+    HAL_GPIO_EXTI_Callback(GPIO_Pin);
+  }
+}
+
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin: Specifies the pins connected EXTI line
+  * @retval None
+  */
+__weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(GPIO_Pin);
+  /* NOTE: This function Should not be modified, when the callback is needed,
+           the HAL_GPIO_EXTI_Callback could be implemented in the user file
+   */
 }
 
 /**

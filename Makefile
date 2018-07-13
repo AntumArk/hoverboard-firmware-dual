@@ -19,19 +19,8 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Peripherals/src/gd32f1x0_adc.c \
-Peripherals/src/gd32f1x0_dma.c \
-Peripherals/src/gd32f1x0_fmc.c \
-Peripherals/src/gd32f1x0_gpio.c \
-Peripherals/src/gd32f1x0_i2c.c \
-Peripherals/src/gd32f1x0_rcc.c \
-Peripherals/src/gd32f1x0_timer.c \
-Peripherals/src/gd32f1x0_usart.c \
-Src/setup.c \
-Src/control.c \
-Src/main.c \
-Src/bldc.c \
-Src/comms.c \
+Peripherals/src/ \
+Src/ \
 core_cm3.c
 
 # ASM sources
