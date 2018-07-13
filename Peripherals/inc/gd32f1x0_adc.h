@@ -19,6 +19,7 @@
 typedef enum { FALSE = 0, TRUE } BOOL;
 /* Includes ------------------------------------------------------------------*/
 #include "gd32f1x0.h"
+#include "gd32f1x0_dma.h"
 /** @addtogroup GD32F1x0_Firmware
   * @{
   */
@@ -63,7 +64,7 @@ typedef struct
 
   DMA_HandleTypeDef             *DMA_Handle;            /*!< Pointer DMA Handler */
 
-  HAL_LockTypeDef               Lock;                   /*!< ADC locking object */
+  //HAL_LockTypeDef               Lock;                   /*!< ADC locking object */
   
   __IO uint32_t                 State;                  /*!< ADC communication state (bitmap of ADC states) */
 

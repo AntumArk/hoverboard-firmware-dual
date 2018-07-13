@@ -47,16 +47,40 @@ typedef struct
 } TIM_Base_InitTypeDef;       
 
 /**
+  * @brief  HAL State structures definition
+  */
+typedef enum
+{
+  HAL_TIM_STATE_RESET             = 0x00U,    /*!< Peripheral not yet initialized or disabled  */
+  HAL_TIM_STATE_READY             = 0x01U,    /*!< Peripheral Initialized and ready for use    */
+  HAL_TIM_STATE_BUSY              = 0x02U,    /*!< An internal process is ongoing              */
+  HAL_TIM_STATE_TIMEOUT           = 0x03U,    /*!< Timeout state                               */
+  HAL_TIM_STATE_ERROR             = 0x04U     /*!< Reception process is ongoing                */
+}HAL_TIM_StateTypeDef;
+
+/**
+  * @brief  HAL Active channel structures definition
+  */
+typedef enum
+{
+  HAL_TIM_ACTIVE_CHANNEL_1        = 0x01U,    /*!< The active channel is 1     */
+  HAL_TIM_ACTIVE_CHANNEL_2        = 0x02U,    /*!< The active channel is 2     */
+  HAL_TIM_ACTIVE_CHANNEL_3        = 0x04U,    /*!< The active channel is 3     */
+  HAL_TIM_ACTIVE_CHANNEL_4        = 0x08U,    /*!< The active channel is 4     */
+  HAL_TIM_ACTIVE_CHANNEL_CLEARED  = 0x00U     /*!< All active channels cleared */
+}HAL_TIM_ActiveChannel;
+
+/**
   * @brief  TIM Time Base Handle Structure definition
   */
 typedef struct
 {
-  TIM_TypeDef                 *Instance;     /*!< Register base address             */
+  TIMER_TypeDef                 *Instance;     /*!< Register base address             */
   TIM_Base_InitTypeDef        Init;          /*!< TIM Time Base required parameters */
   HAL_TIM_ActiveChannel       Channel;       /*!< Active channel                    */
   DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array
                                                 This array is accessed by a @ref TIM_DMA_Handle_index */
-  HAL_LockTypeDef             Lock;          /*!< Locking object                    */
+  //HAL_LockTypeDef             Lock;          /*!< Locking object                    */
   __IO HAL_TIM_StateTypeDef   State;         /*!< TIM operation state               */
 }TIM_HandleTypeDef;
 

@@ -31,6 +31,14 @@
   * @{
   */
 
+typedef enum
+{
+  HAL_DMA_STATE_RESET             = 0x00U,  /*!< DMA not yet initialized or disabled    */
+  HAL_DMA_STATE_READY             = 0x01U,  /*!< DMA initialized and ready for use      */
+  HAL_DMA_STATE_BUSY              = 0x02U,  /*!< DMA process is ongoing                 */
+  HAL_DMA_STATE_TIMEOUT           = 0x03U   /*!< DMA timeout state                      */
+}HAL_DMA_StateTypeDef;
+  
 /** 
   * @brief  DMA Initial Parameters
   */
@@ -80,7 +88,7 @@ typedef struct __DMA_HandleTypeDef
   
   DMA_InitTypeDef       Init;                            /*!< DMA communication parameters           */ 
   
-  HAL_LockTypeDef       Lock;                            /*!< DMA locking object                     */  
+  //HAL_LockTypeDef       Lock;                            /*!< DMA locking object                     */  
   
   HAL_DMA_StateTypeDef  State;                           /*!< DMA transfer state                     */
   
