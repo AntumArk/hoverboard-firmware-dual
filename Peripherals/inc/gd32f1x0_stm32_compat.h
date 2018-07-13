@@ -12,8 +12,10 @@
 #ifndef __GD32F1X0_STM32_COMPAT_H
 #define __GD32F1X0_STM32_COMPAT_H
 
-#define uint16_t uint16;
-#define uint32_t uint32;
+#ifndef uint16_t
+	#define uint16_t uint16
+#endif
+//#define uint32_t uint32
 
 #ifndef __WEAK
 	#define __WEAK __attribute__((weak))
