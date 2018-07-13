@@ -19,7 +19,7 @@
 typedef enum { FALSE = 0, TRUE } BOOL;
 /* Includes ------------------------------------------------------------------*/
 #include "gd32f1x0.h"
-#include "gd32f1x0_dma.h"
+
 /** @addtogroup GD32F1x0_Firmware
   * @{
   */
