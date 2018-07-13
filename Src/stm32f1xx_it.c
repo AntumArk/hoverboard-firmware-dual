@@ -36,9 +36,11 @@
 #include "stm32f1xx_it.h"
 #include "config.h"
 
+#ifdef ENABLE_I2C
 extern DMA_HandleTypeDef hdma_i2c2_rx;
 extern DMA_HandleTypeDef hdma_i2c2_tx;
 extern I2C_HandleTypeDef hi2c2;
+#endif
 
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart2_tx;

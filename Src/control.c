@@ -6,9 +6,14 @@
 #include <stdbool.h>
 #include <string.h>
 
+#ifdef CONTROL_PPM
 TIM_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
+#endif
+
 uint32_t timeout = 100;
+
+#ifdef CONTROL_NUNCHUCK
 uint8_t nunchuck_data[6] = {0};
 
 uint8_t i2cBuffer[2];
@@ -16,6 +21,7 @@ uint8_t i2cBuffer[2];
 extern I2C_HandleTypeDef hi2c2;
 DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
+#endif
 
 #ifdef CONTROL_PPM
 uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
@@ -84,6 +90,7 @@ void PPM_Init() {
 }
 #endif
 
+#ifdef CONTROL_NUNCHUCK
 void Nunchuck_Init() {
     //-- START -- init WiiNunchuck
   i2cBuffer[0] = 0xF0;
@@ -119,3 +126,4 @@ void Nunchuck_Read() {
   //setScopeChannel(2, (int)nunchuck_data[5] & 1);
   //setScopeChannel(3, ((int)nunchuck_data[5] >> 1) & 1);
 }
+#endif

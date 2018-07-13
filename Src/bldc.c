@@ -6,11 +6,11 @@
 
 
 volatile int posl = 0;
-volatile int posr = 0;
+//volatile int posr = 0;
 volatile int pwml = 0;
-volatile int pwmr = 0;
+//volatile int pwmr = 0;
 volatile int weakl = 0;
-volatile int weakr = 0;
+//volatile int weakr = 0;
 
 extern volatile int speed;
 
@@ -148,7 +148,9 @@ volatile int vel = 0;
 //=640 cpu cycles
 void DMA1_Channel1_IRQHandler() {
   DMA1->IFCR = DMA_IFCR_CTCIF1;
-  // HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+  #ifdef DEBUG_LED
+  HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+  #endif
 
   if(offsetcount < 1000) {  // calibrate ADC offsets
     offsetcount++;
@@ -180,39 +182,49 @@ void DMA1_Channel1_IRQHandler() {
   //disable PWM when current limit is reached (current chopping)
   if(ABS((adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0) {
     LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
-    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+	#ifdef DEBUG_LED
+    HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+	#endif
   } else {
     LEFT_TIM->BDTR |= TIM_BDTR_MOE;
-    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
+	#ifdef DEBUG_LED
+    HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
+	#endif
   }
-
+	
+  /*
   if(ABS((adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP)  > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0) {
     RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
   } else {
     RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
   }
+  */
 
   int ul, vl, wl;
-  int ur, vr, wr;
+  //int ur, vr, wr;
 
   //determine next position based on hall sensors
   uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
   uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
   uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
-
+  
+  /*
   uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
   uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
   uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
+  */
 
   uint8_t halll = hall_ul * 1 + hall_vl * 2 + hall_wl * 4;
   posl          = hall_to_pos[halll];
   posl += 2;
   posl %= 6;
-
+  
+  /*
   uint8_t hallr = hall_ur * 1 + hall_vr * 2 + hall_wr * 4;
   posr          = hall_to_pos[hallr];
   posr += 2;
   posr %= 6;
+  */
 
   blockPhaseCurrent(posl, adc_buffer.rl1 - offsetrl1, adc_buffer.rl2 - offsetrl2, &curl);
 
@@ -231,7 +243,7 @@ void DMA1_Channel1_IRQHandler() {
 
   //update PWM channels based on position
   blockPWM(pwml, posl, &ul, &vl, &wl);
-  blockPWM(pwmr, posr, &ur, &vr, &wr);
+  //blockPWM(pwmr, posr, &ur, &vr, &wr);
 
   int weakul, weakvl, weakwl;
   if (pwml > 0) {
@@ -243,6 +255,7 @@ void DMA1_Channel1_IRQHandler() {
   vl += weakvl;
   wl += weakwl;
 
+  /*
   int weakur, weakvr, weakwr;
   if (pwmr > 0) {
     blockPWM(weakr, (posr+5) % 6, &weakur, &weakvr, &weakwr);
@@ -252,12 +265,15 @@ void DMA1_Channel1_IRQHandler() {
   ur += weakur;
   vr += weakvr;
   wr += weakwr;
+  */
 
   LEFT_TIM->LEFT_TIM_U = CLAMP(ul + pwm_res / 2, 10, pwm_res-10);
   LEFT_TIM->LEFT_TIM_V = CLAMP(vl + pwm_res / 2, 10, pwm_res-10);
   LEFT_TIM->LEFT_TIM_W = CLAMP(wl + pwm_res / 2, 10, pwm_res-10);
-
+  
+  /*
   RIGHT_TIM->RIGHT_TIM_U = CLAMP(ur + pwm_res / 2, 10, pwm_res-10);
   RIGHT_TIM->RIGHT_TIM_V = CLAMP(vr + pwm_res / 2, 10, pwm_res-10);
   RIGHT_TIM->RIGHT_TIM_W = CLAMP(wr + pwm_res / 2, 10, pwm_res-10);
+  */
 }

@@ -33,8 +33,10 @@ extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern volatile adc_buf_t adc_buffer;
 //LCD_PCF8574_HandleTypeDef lcd;
+#ifdef ENABLE_I2C
 extern I2C_HandleTypeDef hi2c2;
-extern UART_HandleTypeDef huart2;
+#endif
+extern UART_HandleTypeDef huart1;
 
 int cmd1;  // normalized input values. -1000 to 1000
 int cmd2;
@@ -55,9 +57,9 @@ int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
 extern volatile int pwml;  // global variable for pwm left. -1000 to 1000
-extern volatile int pwmr;  // global variable for pwm right. -1000 to 1000
+//extern volatile int pwmr;  // global variable for pwm right. -1000 to 1000
 extern volatile int weakl; // global variable for field weakening left. -1000 to 1000
-extern volatile int weakr; // global variable for field weakening right. -1000 to 1000
+//extern volatile int weakr; // global variable for field weakening right. -1000 to 1000
 
 extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1, 2, 3, 4, 5, 6, 7...
 extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
@@ -67,7 +69,9 @@ extern uint8_t enable; // global variable for motor enable
 extern volatile uint32_t timeout; // global variable for timeout
 extern float batteryVoltage; // global variable for battery voltage
 
+#ifdef CONTROL_NUNCHUCK
 extern uint8_t nunchuck_data[6];
+#endif
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
 #endif
@@ -102,22 +106,24 @@ int main(void) {
   MX_ADC1_Init();
   MX_ADC2_Init();
 
-  #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
+  #if defined(DEBUG_SERIAL_USART1)
     UART_Init();
   #endif
 
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);
 
   HAL_ADC_Start(&hadc1);
-  HAL_ADC_Start(&hadc2);
+  HAL_ADC_Start(&hadc2); //TO FIX : Is it for right motor? (def in setup.c)
 
   for (int i = 8; i >= 0; i--) {
     buzzerFreq = i;
     HAL_Delay(100);
   }
   buzzerFreq = 0;
-
+  
+  #ifdef DEBUG_LED
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+  #endif
 
   int lastSpeedL = 0, lastSpeedR = 0;
   int speedL = 0, speedR = 0;
@@ -132,9 +138,9 @@ int main(void) {
     Nunchuck_Init();
   #endif
 
-  #ifdef CONTROL_SERIAL_USART2
+  #ifdef CONTROL_SERIAL_USART1
     UART_Control_Init();
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, 4);
+    HAL_UART_Receive_DMA(&huart1, (uint8_t *)&command, 4);
   #endif
 
   #ifdef DEBUG_I2C_LCD
@@ -192,7 +198,7 @@ int main(void) {
       timeout = 0;
     #endif
 
-    #ifdef CONTROL_SERIAL_USART2
+    #ifdef CONTROL_SERIAL_USART1
       cmd1 = CLAMP((int16_t)command.steer, -1000, 1000);
       cmd2 = CLAMP((int16_t)command.speed, -1000, 1000);
 
@@ -206,8 +212,14 @@ int main(void) {
 
 
     // ####### MIXER #######
-    speedR = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
-    speedL = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
+    #ifdef MOTOR_RIGHT_SIDE
+		speedR = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
+		speedL = 0;
+	#endif
+	#ifdef MOTOR_LEFT_SIDE
+		speedL = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
+		speedR = 0;
+	#endif
 
 
     // ####### DEBUG SERIAL OUT #######
@@ -223,21 +235,28 @@ int main(void) {
     #endif
 
     // ####### SET OUTPUTS #######
-    if ((speedL < lastSpeedL + 50 && speedL > lastSpeedL - 50) && (speedR < lastSpeedR + 50 && speedR > lastSpeedR - 50) && timeout < TIMEOUT) {
-    #ifdef INVERT_R_DIRECTION
-      pwmr = speedR;
-    #else
-      pwmr = -speedR;
-    #endif
-    #ifdef INVERT_L_DIRECTION
-      pwml = -speedL;
-    #else
-      pwml = speedL;
-    #endif
-    }
+	#ifdef MOTOR_LEFT_SIDE
+		if ((speedL < lastSpeedL + 50 && speedL > lastSpeedL - 50) && timeout < TIMEOUT) {
+			#ifdef INVERT_L_DIRECTION
+			  pwml = -speedL;
+			#else
+			  pwml = speedL;
+			#endif
+		}
+	
+		lastSpeedL = speedL;
+	#endif
+	#ifdef MOTOR_RIGHT_SIDE
+		if ((speedR < lastSpeedR + 50 && speedR > lastSpeedR - 50) && timeout < TIMEOUT) {
+			#ifdef INVERT_L_DIRECTION
+			  pwmr = speedR;
+			#else
+			  pwmr = -speedR;
+			#endif
+		}
 
-    lastSpeedL = speedL;
-    lastSpeedR = speedR;
+		lastSpeedR = speedR;
+	#endif
 
     // ####### LOG TO CONSOLE #######
     consoleScope();
