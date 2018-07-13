@@ -19,10 +19,11 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-$(wildcard Src/*.c) \
-$(wildcard CMSIS/*.c) \
 core_cm3.c \
-$(wildcard Peripherals/src/*.c)
+$(wildcard Peripherals/src/*.c) \
+$(wildcard CMSIS/*.c) \
+$(wildcard Src/*.c)
+
 
 # ASM sources
 ASM_SOURCES =  \
