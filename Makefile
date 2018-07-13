@@ -45,7 +45,7 @@ Src/stm32f1xx_it.c \
 
 # ASM sources
 ASM_SOURCES =  \
-startup_stm32f103xe.s
+startup_gd32f1x0.s
 
 #######################################
 # binaries
@@ -114,7 +114,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = STM32F103RCTx_FLASH.ld
+LDSCRIPT = stm32f103c8.ld
 
 # libraries
 LIBS = -lc -lm -lnosys
@@ -166,7 +166,7 @@ flash:
 	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
 
 flash-openocd:
-	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg -c init -c "reset halt" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "verify_image $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "reset run" -c shutdown
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "verify_image $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "reset run" -c shutdown
 
 unlock:
 	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
