@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "stm32f1xx_hal.h"
+#include "gd32f1x0_hal.h"
 
 void MX_GPIO_Init(void);
 void MX_TIM_Init(void);

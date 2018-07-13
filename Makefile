@@ -19,29 +19,38 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c \
-Src/system_stm32f1xx.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_flash.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_pwr.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_rcc.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_tim.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_tim_ex.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_gpio_ex.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_adc_ex.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_cortex.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_flash_ex.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_gpio.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_rcc_ex.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_adc.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_uart.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_i2c.c \
+Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_dma.c \
+Src/system_gd32f1x0.c \
 Src/setup.c \
 Src/control.c \
 Src/main.c \
 Src/bldc.c \
 Src/comms.c \
-Src/stm32f1xx_it.c \
+Src/gd32f1x0_it.c \
+core_cm3.c \
+Peripherals/src/gd32f1x0_adc.c \
+Peripherals/src/gd32f1x0_dma.c \
+Peripherals/src/gd32f1x0_fmc.c \
+Peripherals/src/gd32f1x0_gpio.c \
+Peripherals/src/gd32f1x0_i2c.c \
+Peripherals/src/gd32f1x0_rcc.c \
+Peripherals/src/gd32f1x0_timer.c \
+Peripherals/src/gd32f1x0_usart.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -92,9 +101,9 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -IInc \
--IDrivers/STM32F1xx_HAL_Driver/Inc \
--IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
--IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
+-IDrivers/GD32F1x0_HAL_Driver/Inc \
+-IDrivers/GD32F1x0_HAL_Driver/Inc/Legacy \
+-IDrivers/CMSIS/Device/ST/GD32F1x0/Include \
 -IDrivers/CMSIS/Include
 
 
@@ -168,10 +177,10 @@ flash:
 	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
 
 flash-openocd:
-	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "verify_image $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "reset run" -c shutdown
+	openocd -f interface/stlink-v2.cfg -f target/gd32f1x.cfg -c init -c "reset halt" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "verify_image $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "reset run" -c shutdown
 
 unlock:
-	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
+	openocd -f interface/stlink-v2.cfg -f target/gd32f1x.cfg -c init -c "reset halt" -c "gd32f1x unlock 0"
 
 #######################################
 # dependencies

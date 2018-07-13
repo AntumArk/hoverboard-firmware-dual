@@ -20,7 +20,7 @@
 */
 
 #pragma once
-#include "stm32f1xx_hal.h"
+#include "gd32f1x0_hal.h"
 
 #define LEFT_HALL_U_PIN GPIO_PIN_11
 #define LEFT_HALL_V_PIN GPIO_PIN_1

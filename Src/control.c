@@ -1,5 +1,5 @@
 
-#include "stm32f1xx_hal.h"
+#include "gd32f1x0_hal.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
