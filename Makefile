@@ -45,7 +45,7 @@ Src/stm32f1xx_it.c \
 
 # ASM sources
 ASM_SOURCES =  \
-startup_gd32f1x0.s
+startup.s
 
 #######################################
 # binaries
@@ -81,7 +81,9 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
--DSTM32F103xE
+-DGD32F1 \
+-D__TARGET_PROCESSOR=GD32F103C8
+#-DUSE_STDPERIPH_DRIVER 
 
 
 # AS includes
@@ -114,7 +116,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = stm32f103c8.ld
+LDSCRIPT = flash.ld
 
 # libraries
 LIBS = -lc -lm -lnosys
