@@ -30,7 +30,7 @@
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
   * @retval None
   */
-void GPIO_DeInit(GPIO_TypeDef* GPIOx)
+void HAL_GPIO_DeInit(GPIO_TypeDef* GPIOx)
 {
     if(GPIOx == GPIOA)
     {
@@ -65,7 +65,7 @@ void GPIO_DeInit(GPIO_TypeDef* GPIOx)
   * @param  GPIO_InitTypeDefStruct: The structuer contains configuration information.
   * @retval None
   */
-void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitTypeDefStruct)
+void HAL_GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitTypeDefStruct)
 {
     uint32_t pin = 0x00;
 
@@ -135,7 +135,7 @@ void HAL_GPIO_LockPin(GPIO_TypeDef* GPIOx, uint16_t Pin)
   * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
   * @retval The input port pin value.
   */
-uint8_t GPIO_ReadInputBit(GPIO_TypeDef* GPIOx, uint16_t Pin)
+uint8_t HAL_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
     if ((GPIOx->DIR & Pin) != (uint32_t)Bit_RESET)
     {
@@ -237,7 +237,7 @@ void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t Pin, GPIO_PinState BitVal)
   *     @arg Bit_SET: set the port pin
   * @retval None
   */
-void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
       GPIOx->ODR ^= Pin;
 }
@@ -283,28 +283,28 @@ void PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t PinSource, uint8_t GPIO_AF)
 
 /**
   * @brief  This function handles EXTI interrupt request.
-  * @param  GPIO_Pin: Specifies the pins connected EXTI line
+  * @param  Pin: Specifies the pins connected EXTI line
   * @retval None
   */
-void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_IRQHandler(uint16_t Pin)
 {
   /* EXTI line interrupt detected */
-  if(__HAL_GPIO_EXTI_GET_IT(GPIO_Pin) != RESET)
+  if(__HAL_GPIO_EXTI_GET_IT(Pin) != RESET)
   {
-    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_Pin);
-    HAL_GPIO_EXTI_Callback(GPIO_Pin);
+    __HAL_GPIO_EXTI_CLEAR_IT(Pin);
+    HAL_GPIO_EXTI_Callback(Pin);
   }
 }
 
 /**
   * @brief  EXTI line detection callbacks.
-  * @param  GPIO_Pin: Specifies the pins connected EXTI line
+  * @param  Pin: Specifies the pins connected EXTI line
   * @retval None
   */
-__weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+__weak void HAL_GPIO_EXTI_Callback(uint16_t Pin)
 {
   /* Prevent unused argument(s) compilation warning */
-  UNUSED(GPIO_Pin);
+  UNUSED(Pin);
   /* NOTE: This function Should not be modified, when the callback is needed,
            the HAL_GPIO_EXTI_Callback could be implemented in the user file
    */

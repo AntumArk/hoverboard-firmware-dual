@@ -140,7 +140,7 @@ typedef struct
     SpeedPara Speed;      /*!< The speed for the selected pins.choose one from @ref SpeedPara  */
     GPIO_OTypePara GPIO_OType;      /*!< The operating output type for the selected pins.choose one from @ref GPIO_OTypePara  */
     PullPara Pull;        /*!< The operating Pull-up/Pull down for the selected pins.choose one from @ref PullPara   */
-}HAL_GPIO_InitTypeDef;
+}GPIO_InitTypeDef;
 
 /**
   * @}
@@ -305,8 +305,8 @@ typedef struct
   * @{
   */
 void HAL_GPIO_DeInit(GPIO_TypeDef* GPIOx);
-void HAL_GPIO_Init(GPIO_TypeDef* GPIOx, HAL_GPIO_InitTypeDef* HAL_GPIO_InitTypeDefStruct);
-void GPIO_ParaInit(HAL_GPIO_InitTypeDef* HAL_GPIO_InitTypeDefStruct);
+void HAL_GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitTypeDefStruct);
+void GPIO_ParaInit(GPIO_InitTypeDef* GPIO_InitTypeDefStruct);
 void HAL_GPIO_LockPin(GPIO_TypeDef* GPIOx, uint16_t Pin);
 uint8_t HAL_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t Pin);
 uint16_t GPIO_ReadInputData(GPIO_TypeDef* GPIOx);
@@ -315,11 +315,11 @@ uint16_t GPIO_ReadOutputData(GPIO_TypeDef* GPIOx);
 void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t Pin);
 void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t Pin);
 void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t Pin, GPIO_PinState BitVal);
-void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t Pin);
 void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal);
 void PinAFConfig(GPIO_TypeDef* GPIOx, uint16_t PinSource, uint8_t GPIO_AF);
-void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin);
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void HAL_GPIO_EXTI_IRQHandler(uint16_t Pin);
+void HAL_GPIO_EXTI_Callback(uint16_t Pin);
 
 #ifdef __cplusplus
 }
