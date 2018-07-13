@@ -62,7 +62,7 @@ typedef struct
 
   ADC_InitTypeDef               Init;                   /*!< ADC required parameters */
 
-  DMA_HandleTypeDef             *DMA_Handle;            /*!< Pointer DMA Handler */
+  //DMA_HandleTypeDef             *DMA_Handle;            /*!< Pointer DMA Handler */ // TO FIX : Strange bug, say DMA_HandleTypeDef not defined...
 
   //HAL_LockTypeDef               Lock;                   /*!< ADC locking object */
   
