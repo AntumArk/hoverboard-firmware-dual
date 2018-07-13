@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gd32f1x0_gpio.h"
 #include "gd32f1x0_rcc.h"
+#include "gd32f1x0_stm32_compat.h"
 
 /** @addtogroup GD32F1x0_Firmware
   * @{
@@ -299,7 +300,7 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t Pin)
   * @retval None
   */
 #ifndef __weak
-attribute((weak)) void HAL_GPIO_EXTI_Callback(uint16_t Pin)
+__attribute__((weak)) void HAL_GPIO_EXTI_Callback(uint16_t Pin)
 #endif
 #ifdef __weak
 __weak void HAL_GPIO_EXTI_Callback(uint16_t Pin)
