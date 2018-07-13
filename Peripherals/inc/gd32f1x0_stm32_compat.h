@@ -21,3 +21,5 @@ typedef uint32_t uint32;
 #ifndef __weak
 	#define __weak __attribute__((weak))
 #endif
+
+#endif
