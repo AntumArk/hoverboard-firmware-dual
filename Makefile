@@ -177,10 +177,10 @@ flash:
 	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
 
 flash-openocd:
-	openocd -f interface/stlink-v2.cfg -f target/gd32f1x.cfg -c init -c "reset halt" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "verify_image $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "reset run" -c shutdown
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "flash write_image erase $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "verify_image $(BUILD_DIR)/$(TARGET).bin 0x08000000" -c "reset run" -c shutdown
 
 unlock:
-	openocd -f interface/stlink-v2.cfg -f target/gd32f1x.cfg -c init -c "reset halt" -c "gd32f1x unlock 0"
+	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
 
 #######################################
 # dependencies
