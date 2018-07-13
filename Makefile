@@ -61,7 +61,8 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
--DGD32F1 \
+-DUSE_HAL_DRIVER \
+-DSTM32F103xB
 -D__TARGET_PROCESSOR=GD32F103C8
 #-DUSE_STDPERIPH_DRIVER 
 
@@ -72,7 +73,7 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -IInc \
--IDrivers/CMSIS \
+-IDrivers/CMSIS/ \
 -IPeripherals/inc/
 
 
