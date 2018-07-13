@@ -19,30 +19,6 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_flash.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_pwr.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_rcc.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_tim.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_tim_ex.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_gpio_ex.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_adc_ex.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_cortex.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_flash_ex.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_gpio.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_rcc_ex.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_adc.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_uart.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_i2c.c \
-Drivers/GD32F1x0_HAL_Driver/Src/gd32f1x0_hal_dma.c \
-Src/system_gd32f1x0.c \
-Src/setup.c \
-Src/control.c \
-Src/main.c \
-Src/bldc.c \
-Src/comms.c \
-Src/gd32f1x0_it.c \
-core_cm3.c \
 Peripherals/src/gd32f1x0_adc.c \
 Peripherals/src/gd32f1x0_dma.c \
 Peripherals/src/gd32f1x0_fmc.c \
@@ -50,7 +26,13 @@ Peripherals/src/gd32f1x0_gpio.c \
 Peripherals/src/gd32f1x0_i2c.c \
 Peripherals/src/gd32f1x0_rcc.c \
 Peripherals/src/gd32f1x0_timer.c \
-Peripherals/src/gd32f1x0_usart.c
+Peripherals/src/gd32f1x0_usart.c \
+Src/setup.c \
+Src/control.c \
+Src/main.c \
+Src/bldc.c \
+Src/comms.c \
+core_cm3.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -89,7 +71,6 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
--DUSE_HAL_DRIVER \
 -DGD32F1 \
 -D__TARGET_PROCESSOR=GD32F103C8
 #-DUSE_STDPERIPH_DRIVER 
@@ -101,8 +82,6 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -IInc \
--IDrivers/GD32F1x0_HAL_Driver/Inc \
--IDrivers/GD32F1x0_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS \
 -IPeripherals/inc/
 
