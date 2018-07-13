@@ -14,3 +14,10 @@
 
 typedef uint16_t uint16;
 typedef uint32_t uint32;
+
+#ifndef __WEAK
+	#define __WEAK attribute((weak))
+#endif
+#ifndef __weak
+	#define __weak attribute((weak))
+#endif

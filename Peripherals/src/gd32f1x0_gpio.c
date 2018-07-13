@@ -236,7 +236,7 @@ void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t Pin, GPIO_PinState BitVal)
   */
 void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t Pin)
 {
-      GPIOx->ODR ^= Pin;
+      GPIOx->DOR ^= Pin; // TO FIX : original = ODR, not working
 }
 
 /**
@@ -298,7 +298,12 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t Pin)
   * @param  Pin: Specifies the pins connected EXTI line
   * @retval None
   */
+#ifndef __weak
+attribute((weak)) void HAL_GPIO_EXTI_Callback(uint16_t Pin)
+#endif
+#ifdef __weak
 __weak void HAL_GPIO_EXTI_Callback(uint16_t Pin)
+#endif
 {
   /* Prevent unused argument(s) compilation warning */
   UNUSED(Pin);

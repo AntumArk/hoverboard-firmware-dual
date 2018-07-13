@@ -10,10 +10,3 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gd32f1x0_stm32_compat.h"
-
-#ifndef __WEAK
-	#define __WEAK attribute((weak))
-#endif
-#ifndef __weak
-	#define __weak attribute((weak))
-#endif
