@@ -19,7 +19,7 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-CMSIS/system_gd32f1x0.c \
+Drivers/CMSIS/system_gd32f1x0.c \
 Peripherals/src/ \
 Src/ \
 core_cm3.c
