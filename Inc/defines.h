@@ -21,6 +21,9 @@
 
 #pragma once
 
+#define uint16_t uint16;
+#define uint32_t uint32;
+
 #define LEFT_HALL_U_PIN GPIO_PIN_11
 #define LEFT_HALL_V_PIN GPIO_PIN_1
 #define LEFT_HALL_W_PIN GPIO_PIN_14

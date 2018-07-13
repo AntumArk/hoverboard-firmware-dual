@@ -40,33 +40,67 @@ typedef struct
     
     uint32_t DMA_MemoryBaseAddr;                  /*!< The base address of the memory. */
                                             
-    uint32_t DMA_DIR;                             /*!< The direction of data transmission.
+    uint32_t Direction;                             /*!< The direction of data transmission.
                                                        detailed in @ref DMA_data_transfer_direction */
     
     uint32_t DMA_BufferSize;                      /*!< The buffer size of data transmission. */
     
-    uint32_t DMA_PeripheralInc;                   /*!< The incremented_mode of the Peripheral address register.
+    uint32_t PeriphInc;                   /*!< The incremented_mode of the Peripheral address register.
                                                        detailed in @ref DMA_peripheral_Address_incremented_mode */
     
-    uint32_t DMA_MemoryInc;                       /*!< The incremented_mode of the memory address register.
+    uint32_t MemInc;                       /*!< The incremented_mode of the memory address register.
                                                        detailed in @ref DMA_peripheral_Address_incremented_mode */
     
-    uint32_t DMA_PeripheralDataSize;              /*!< The data transmission width of Peripheral.
+    uint32_t PeriphDataAlignment;              /*!< The data transmission width of Peripheral.
                                                        detailed in @ref DMA_peripheral_data_size */
     
-    uint32_t DMA_MemoryDataSize;                  /*!< The data transmission width of Memory.
+    uint32_t MemDataAlignment;                  /*!< The data transmission width of Memory.
                                                        detailed in @ref DMA_peripheral_data_size */
     
-    uint32_t DMA_Mode;                            /*!< The mode of circular transmission.
+    uint32_t Mode;                            /*!< The mode of circular transmission.
                                                        detailed in @ref DMA_circular_normal_mode */
     
-    uint32_t DMA_Priority;                        /*!< The software priority for the DMAy Channelx.
-                                                       detailed in @ref DMA_priority_level */
+    uint32_t Priority;                        /*!< The software priority for the DMAy Channelx.
+                                                       detailed in @ref Priority_level */
     uint32_t DMA_MTOM;                            /*!< The mode of memory-to-memory transfer.
                                                        detailed in @ref DMA_memory_to_memory */
-}DMA_InitPara;
+}DMA_InitTypeDef;
 
 
+/**
+  * @}
+  */
+  
+/** 
+  * @brief  DMA handle Structure definition
+  */
+typedef struct __DMA_HandleTypeDef
+{
+  DMA_Channel_TypeDef   *Instance;                       /*!< Register base address                  */
+  
+  DMA_InitTypeDef       Init;                            /*!< DMA communication parameters           */ 
+  
+  HAL_LockTypeDef       Lock;                            /*!< DMA locking object                     */  
+  
+  HAL_DMA_StateTypeDef  State;                           /*!< DMA transfer state                     */
+  
+  void                  *Parent;                                                      /*!< Parent object state                    */  
+  
+  void                  (* XferCpltCallback)( struct __DMA_HandleTypeDef * hdma);     /*!< DMA transfer complete callback         */
+  
+  void                  (* XferHalfCpltCallback)( struct __DMA_HandleTypeDef * hdma); /*!< DMA Half transfer complete callback    */
+  
+  void                  (* XferErrorCallback)( struct __DMA_HandleTypeDef * hdma);    /*!< DMA transfer error callback            */
+
+  void                  (* XferAbortCallback)( struct __DMA_HandleTypeDef * hdma);    /*!< DMA transfer abort callback            */  
+  
+  __IO uint32_t         ErrorCode;                                                    /*!< DMA Error code                         */
+
+  DMA_TypeDef            *DmaBaseAddress;                                             /*!< DMA Channel Base Address               */
+  
+  uint32_t               ChannelIndex;                                                /*!< DMA Channel Index                      */  
+
+} DMA_HandleTypeDef;    
 /**
   * @}
   */
@@ -78,8 +112,8 @@ typedef struct
 /** @defgroup DMA_data_transfer_direction 
   * @{                                                                                                                         
   */
-#define DMA_DIR_PERIPHERALSRC               ((uint32_t)0x00000000)
-#define DMA_DIR_PERIPHERALDST               DMA_CTLRx_DIR
+#define Direction_PERIPHERALSRC               ((uint32_t)0x00000000)
+#define Direction_PERIPHERALDST               DMA_CTLRx_DIR
 
 
 /**
@@ -89,8 +123,8 @@ typedef struct
 /** @defgroup DMA_peripheral_Address_Increasing_mode 
   * @{
   */
-#define DMA_PERIPHERALINC_DISABLE           ((uint32_t)0x00000000)
-#define DMA_PERIPHERALINC_ENABLE            DMA_CTLRx_PNAGA
+#define PeriphInc_DISABLE           ((uint32_t)0x00000000)
+#define PeriphInc_ENABLE            DMA_CTLRx_PNAGA
 
 /**
   * @}
@@ -99,8 +133,8 @@ typedef struct
 /** @defgroup DMA_memory_Address_Increasing_mode 
   * @{
   */
-#define DMA_MEMORYINC_DISABLE               ((uint32_t)0x00000000)
-#define DMA_MEMORYINC_ENABLE                DMA_CTLRx_MNAGA
+#define MemInc_DISABLE               ((uint32_t)0x00000000)
+#define MemInc_ENABLE                DMA_CTLRx_MNAGA
 
 /**
   * @}
@@ -109,9 +143,9 @@ typedef struct
 /** @defgroup DMA_peripheral_data_size 
   * @{
   */
-#define DMA_PERIPHERALDATASIZE_BYTE         ((uint32_t)0x00000000)
-#define DMA_PERIPHERALDATASIZE_HALFWORD     DMA_CTLRx_PSIZE_0
-#define DMA_PERIPHERALDATASIZE_WORD         DMA_CTLRx_PSIZE_1
+#define PeriphDataAlignment_BYTE         ((uint32_t)0x00000000)
+#define PeriphDataAlignment_HALFWORD     DMA_CTLRx_PSIZE_0
+#define PeriphDataAlignment_WORD         DMA_CTLRx_PSIZE_1
 
 /**
   * @}
@@ -120,9 +154,9 @@ typedef struct
 /** @defgroup DMA_memory_data_size 
   * @{
   */
-#define DMA_MEMORYDATASIZE_BYTE             ((uint32_t)0x00000000)
-#define DMA_MEMORYDATASIZE_HALFWORD         DMA_CTLRx_MSIZE_0
-#define DMA_MEMORYDATASIZE_WORD             DMA_CTLRx_MSIZE_1
+#define MemDataAlignment_BYTE             ((uint32_t)0x00000000)
+#define MemDataAlignment_HALFWORD         DMA_CTLRx_MSIZE_0
+#define MemDataAlignment_WORD             DMA_CTLRx_MSIZE_1
 
 /**
   * @}
@@ -131,20 +165,20 @@ typedef struct
 /** @defgroup DMA_circular_normal_mode 
   * @{
   */
-#define DMA_MODE_NORMAL                     ((uint32_t)0x00000000)
-#define DMA_MODE_CIRCULAR                   DMA_CTLRx_CIRC
+#define Mode_NORMAL                     ((uint32_t)0x00000000)
+#define Mode_CIRCULAR                   DMA_CTLRx_CIRC
 
 /**
   * @}
   */
 
-/** @defgroup DMA_priority_level 
+/** @defgroup Priority_level 
   * @{
   */
-#define DMA_PRIORITY_VERYHIGH               DMA_CTLRx_PRIO
-#define DMA_PRIORITY_HIGH                   DMA_CTLRx_PRIO_1
-#define DMA_PRIORITY_MEDIUM                 DMA_CTLRx_PRIO_0
-#define DMA_PRIORITY_LOW                    ((uint32_t)0x00000000)
+#define Priority_VERYHIGH               DMA_CTLRx_PRIO
+#define Priority_HIGH                   DMA_CTLRx_PRIO_1
+#define Priority_MEDIUM                 DMA_CTLRx_PRIO_0
+#define Priority_LOW                    ((uint32_t)0x00000000)
 
 /**
   * @}
@@ -248,8 +282,8 @@ typedef struct
 void DMA_DeInit(DMA_Channel_TypeDef* DMAy_Channelx);
 
 /* The functions of Initialization and Configuration  *********************************/
-void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitPara* DMA_InitParaStruct);
-void DMA_ParaInit(DMA_InitPara* DMA_InitParaStruct);
+void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitTypeDef* DMA_InitTypeDefStruct);
+void DMA_ParaInit(DMA_InitTypeDef* DMA_InitTypeDefStruct);
 void DMA_Enable(DMA_Channel_TypeDef* DMAy_Channelx, TypeState NewValue);
 
 /* The functions of Data Counter ******************************************************/ 

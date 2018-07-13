@@ -116,12 +116,12 @@ void DMA_DeInit(DMA_Channel_TypeDef* DMAy_Channelx)
 }
 
 /**
-  * @brief  Initialize the DMAy Channelx according to the DMA_InitParaStruct.
+  * @brief  Initialize the DMAy Channelx according to the DMA_InitTypeDefStruct.
   * @param  DMAy_Channelx: where y:[1] to select the DMA and x:[1,7] to select the DMA Channel.
-  * @param  DMA_InitParaStruct: contain the configuration information for the specified DMA Channel.
+  * @param  DMA_InitTypeDefStruct: contain the configuration information for the specified DMA Channel.
   * @retval None
   */
-void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitPara* DMA_InitParaStruct)
+void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitTypeDef* DMA_InitTypeDefStruct)
 {
     uint32_t temp = 0;
     
@@ -132,54 +132,54 @@ void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitPara* DMA_InitParaStru
     temp &= CTLRx_CLEAR_MASK;
     
     /* Configure DMAy Channelx: data transfer, data size, priority level and mode */
-    /* Set MEMTOMEM, PRIO, MSIZE, PSIZE, MNAGA, PNAGA, CIRC and DIR bits according to DMA_InitParaStruct */
-    temp |= DMA_InitParaStruct->DMA_DIR | DMA_InitParaStruct->DMA_Mode |
-            DMA_InitParaStruct->DMA_PeripheralInc | DMA_InitParaStruct->DMA_MemoryInc |
-            DMA_InitParaStruct->DMA_PeripheralDataSize | DMA_InitParaStruct->DMA_MemoryDataSize |
-            DMA_InitParaStruct->DMA_Priority | DMA_InitParaStruct->DMA_MTOM;
+    /* Set MEMTOMEM, PRIO, MSIZE, PSIZE, MNAGA, PNAGA, CIRC and DIR bits according to DMA_InitTypeDefStruct */
+    temp |= DMA_InitTypeDefStruct->Direction | DMA_InitTypeDefStruct->Mode |
+            DMA_InitTypeDefStruct->PeriphInc | DMA_InitTypeDefStruct->MemInc |
+            DMA_InitTypeDefStruct->PeriphDataAlignment | DMA_InitTypeDefStruct->MemDataAlignment |
+            DMA_InitTypeDefStruct->Priority | DMA_InitTypeDefStruct->DMA_MTOM;
 
     /* Write to DMAy Channelx CTLRx */
     DMAy_Channelx->CTLRx = temp;
     
     /* Write to DMAy Channelx RCNTx */
-    DMAy_Channelx->RCNTx = DMA_InitParaStruct->DMA_BufferSize;
+    DMAy_Channelx->RCNTx = DMA_InitTypeDefStruct->DMA_BufferSize;
     
     /* Write to DMAy Channelx PBARx */
-    DMAy_Channelx->PBARx = DMA_InitParaStruct->DMA_PeripheralBaseAddr;
+    DMAy_Channelx->PBARx = DMA_InitTypeDefStruct->DMA_PeripheralBaseAddr;
     
     /* Write to DMAy Channelx MBARx */
-    DMAy_Channelx->MBARx = DMA_InitParaStruct->DMA_MemoryBaseAddr;
+    DMAy_Channelx->MBARx = DMA_InitTypeDefStruct->DMA_MemoryBaseAddr;
 }
 
 /**
-  * @brief  Set each DMA_InitParaStruct member to its default value.
-  * @param  DMA_InitParaStruct: The structure pointer to DMA_InitParaStruct will be initialized.
+  * @brief  Set each DMA_InitTypeDefStruct member to its default value.
+  * @param  DMA_InitTypeDefStruct: The structure pointer to DMA_InitTypeDefStruct will be initialized.
   * @retval None
   */
-void DMA_ParaInit(DMA_InitPara* DMA_InitParaStruct)
+void DMA_ParaInit(DMA_InitTypeDef* DMA_InitTypeDefStruct)
 {
     /*-------------- Reset DMA init structure parameters values ------------------*/
-    DMA_InitParaStruct->DMA_PeripheralBaseAddr = DMA_INIT_RESET;
+    DMA_InitTypeDefStruct->DMA_PeripheralBaseAddr = DMA_INIT_RESET;
     
-    DMA_InitParaStruct->DMA_MemoryBaseAddr = DMA_INIT_RESET;
+    DMA_InitTypeDefStruct->DMA_MemoryBaseAddr = DMA_INIT_RESET;
     
-    DMA_InitParaStruct->DMA_DIR = DMA_DIR_PERIPHERALSRC;
+    DMA_InitTypeDefStruct->Direction = Direction_PERIPHERALSRC;
     
-    DMA_InitParaStruct->DMA_BufferSize = DMA_INIT_RESET;
+    DMA_InitTypeDefStruct->DMA_BufferSize = DMA_INIT_RESET;
     
-    DMA_InitParaStruct->DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;
+    DMA_InitTypeDefStruct->PeriphInc = PeriphInc_DISABLE;
     
-    DMA_InitParaStruct->DMA_MemoryInc = DMA_MEMORYINC_DISABLE;
+    DMA_InitTypeDefStruct->MemInc = MemInc_DISABLE;
     
-    DMA_InitParaStruct->DMA_PeripheralDataSize = DMA_PERIPHERALDATASIZE_BYTE;
+    DMA_InitTypeDefStruct->PeriphDataAlignment = PeriphDataAlignment_BYTE;
     
-    DMA_InitParaStruct->DMA_MemoryDataSize = DMA_MEMORYDATASIZE_BYTE;
+    DMA_InitTypeDefStruct->MemDataAlignment = MemDataAlignment_BYTE;
     
-    DMA_InitParaStruct->DMA_Mode = DMA_MODE_NORMAL;
+    DMA_InitTypeDefStruct->Mode = Mode_NORMAL;
     
-    DMA_InitParaStruct->DMA_Priority = DMA_PRIORITY_LOW;
+    DMA_InitTypeDefStruct->Priority = Priority_LOW;
     
-    DMA_InitParaStruct->DMA_MTOM = DMA_MEMTOMEM_DISABLE;
+    DMA_InitTypeDefStruct->DMA_MTOM = DMA_MEMTOMEM_DISABLE;
 }
 
 /**

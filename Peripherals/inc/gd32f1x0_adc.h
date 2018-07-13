@@ -36,18 +36,39 @@ typedef enum { FALSE = 0, TRUE } BOOL;
   */
 typedef struct
 {
-    uint32_t ADC_Trig_External;         /*!< Defines the external trigger used to start the AD conversion of regular channels.  */
-    uint8_t ADC_Channel_Number;         /*!< Specifies the number of ADC channels that will be converted.
+    uint32_t ExternalTrigConv;         /*!< Defines the external trigger used to start the AD conversion of regular channels.  */
+    uint8_t NbrOfConversion;         /*!< Specifies the number of ADC channels that will be converted.
                                              This parameter must range from 1 to 16. */ 
-    uint32_t ADC_Data_Align;            /*!< Specifies whether the ADC data alignment is left or right. */
-    TypeState ADC_Mode_Scan;            /*!< Specifies whether the conversion is performed in
+    uint32_t DataAlign;            /*!< Specifies whether the ADC data alignment is left or right. */
+    TypeState ScanConvMode;            /*!< Specifies whether the conversion is performed in
                                              multichannels or Single channel mode.
                                              This parameter can be set to ENABLE or DISABLE */
-    TypeState ADC_Mode_Continuous;      /*!< Specifies whether the conversion is performed in
+    TypeState ContinuousConvMode;      /*!< Specifies whether the conversion is performed in
                                              Continuous or Single mode.
                                              This parameter can be set to ENABLE or DISABLE. */
-}ADC_InitPara;
+}ADC_InitTypeDef;
 
+/**
+  * @}
+  */
+  
+/** 
+  * @brief  ADC handle Structure definition  
+  */ 
+typedef struct
+{
+  ADC_TypeDef                   *Instance;              /*!< Register base address */
+
+  ADC_InitTypeDef               Init;                   /*!< ADC required parameters */
+
+  DMA_HandleTypeDef             *DMA_Handle;            /*!< Pointer DMA Handler */
+
+  HAL_LockTypeDef               Lock;                   /*!< ADC locking object */
+  
+  __IO uint32_t                 State;                  /*!< ADC communication state (bitmap of ADC states) */
+
+  __IO uint32_t                 ErrorCode;              /*!< ADC Error code */
+}ADC_HandleTypeDef;
 /**
   * @}
   */
@@ -204,8 +225,8 @@ typedef struct
 /** @defgroup ADC_Exported_Functions
   * @{
   */
-void ADC_DeInit(ADC_InitPara* ADC_InitParaStruct);
-void ADC_Init(ADC_InitPara* ADC_InitParaStruct);
+void ADC_DeInit(ADC_InitTypeDef* ADC_InitTypeDefStruct);
+void ADC_Init(ADC_InitTypeDef* ADC_InitTypeDefStruct);
 void ADC_Enable(TypeState NewValue);
 void ADC_DMA_Enable(TypeState NewValue);
 void ADC_INTConfig(uint16_t ADC_INT, TypeState NewValue);

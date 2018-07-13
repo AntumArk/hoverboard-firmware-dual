@@ -37,14 +37,32 @@
 
 typedef struct
 {
-    uint16_t TIMER_Prescaler;                       /*!< Clock prescaler value . */
-    uint16_t TIMER_CounterMode;                     /*!< Counter mode , 
+    uint16_t Prescaler;                       /*!< Clock prescaler value . */
+    uint16_t CounterMode;                     /*!< Counter mode , 
                                                          a value of @ref TIMER_Counter_Mode. */
-    uint32_t TIMER_Period;                          /*!< Value to be loaded into the active CARL at the next update event. */ 
-    uint16_t TIMER_ClockDivision;                   /*!< Clock division , 
+    uint32_t Period;                          /*!< Value to be loaded into the active CARL at the next update event. */ 
+    uint16_t ClockDivision;                   /*!< Clock division , 
                                                          a value of @ref TIMER_Clock_Division_CDIV. */
-    uint8_t  TIMER_RepetitionCounter;               /*!< Repetition counter value , only valid in TIMER1/15/16/17. */
-} TIMER_BaseInitPara;       
+    uint8_t  RepetitionCounter;               /*!< Repetition counter value , only valid in TIMER1/15/16/17. */
+} TIM_Base_InitTypeDef;       
+
+/**
+  * @brief  TIM Time Base Handle Structure definition
+  */
+typedef struct
+{
+  TIM_TypeDef                 *Instance;     /*!< Register base address             */
+  TIM_Base_InitTypeDef        Init;          /*!< TIM Time Base required parameters */
+  HAL_TIM_ActiveChannel       Channel;       /*!< Active channel                    */
+  DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array
+                                                This array is accessed by a @ref TIM_DMA_Handle_index */
+  HAL_LockTypeDef             Lock;          /*!< Locking object                    */
+  __IO HAL_TIM_StateTypeDef   State;         /*!< TIM operation state               */
+}TIM_HandleTypeDef;
+
+/**
+  * @}
+  */
 
 /** 
   * @brief  Timer output compare init structure  
@@ -491,7 +509,7 @@ typedef struct
   * @}
   */
 
-/** @defgroup TIMER_Prescaler_Reload_Mode 
+/** @defgroup Prescaler_Reload_Mode 
   * @{
   */
 #define TIMER_PSC_RELOAD_UPDATE                   ((uint16_t)0x0000)
@@ -667,10 +685,10 @@ typedef struct
   */
 /* TimeBase management ********************************************************/
 void TIMER_DeInit( TIMER_TypeDef* TIMERx );
-void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_BaseInitPara* TIMER_BaseInitParaStruct);
-void TIMER_BaseStructInit( TIMER_BaseInitPara* TIMER_BaseInitParaStruct);
-void TIMER_PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t TIMER_PSCReloadMode );
-void TIMER_CounterMode( TIMER_TypeDef* TIMERx , uint16_t TIMER_CounterMode);
+void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct);
+void TIMER_BaseStructInit( TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct);
+void PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t TIMER_PSCReloadMode );
+void CounterMode( TIMER_TypeDef* TIMERx , uint16_t CounterMode);
 void TIMER_SetCounter( TIMER_TypeDef* TIMERx , uint32_t Counter);
 void TIMER_SetAutoreload( TIMER_TypeDef* TIMERx , uint32_t AutoReloadValue );
 uint32_t TIMER_GetCounter( TIMER_TypeDef* TIMERx );

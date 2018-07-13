@@ -107,10 +107,10 @@ void TIMER_DeInit( TIMER_TypeDef* TIMERx )
 /**
   * @brief  Initialize the specified Timer     
   * @param  TIMERx:  x ={ 1 , 2 , 3 , 6 , 14 , 15 , 16 , 17 } .
-  * @param  TIMER_Init: pointer to a TIMER_BaseInitPara structure.
+  * @param  TIMER_Init: pointer to a TIM_Base_InitTypeDef structure.
   * @retval None
   */
-void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_BaseInitPara* TIMER_BaseInitParaStruct)
+void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct)
 {
     uint16_t tmpctlr1 = 0;
     
@@ -120,23 +120,23 @@ void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_BaseInitPara* TIMER_BaseInitP
     {
         /* Configure the Counter Mode */
         tmpctlr1 &= (uint16_t)(~( ( uint16_t )( TIMER_CTLR1_DIR | TIMER_CTLR1_CAM)));
-        tmpctlr1 |= (uint32_t)TIMER_BaseInitParaStruct->TIMER_CounterMode;
+        tmpctlr1 |= (uint32_t)TIM_Base_InitTypeDefStruct->CounterMode;
     }
     
     if( TIMERx != TIMER6 )
     {
         /* Configure the clock division */
         tmpctlr1 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR1_CDIV));
-        tmpctlr1 |= (uint32_t)TIMER_BaseInitParaStruct->TIMER_ClockDivision;
+        tmpctlr1 |= (uint32_t)TIM_Base_InitTypeDefStruct->ClockDivision;
     }
     
     TIMERx->CTLR1 = tmpctlr1;
     
     /* Configure the Autoreload value */
-    TIMERx->CARL = TIMER_BaseInitParaStruct->TIMER_Period ;
+    TIMERx->CARL = TIM_Base_InitTypeDefStruct->Period ;
     
     /* Configure the Prescaler value */
-    TIMERx->PSC = TIMER_BaseInitParaStruct->TIMER_Prescaler;
+    TIMERx->PSC = TIM_Base_InitTypeDefStruct->Prescaler;
     
     if (( TIMERx == TIMER1)  || 
         ( TIMERx == TIMER15) || 
@@ -144,7 +144,7 @@ void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_BaseInitPara* TIMER_BaseInitP
         ( TIMERx == TIMER17 ) )  
     {
         /* Configure the Repetition Counter value */
-        TIMERx->CREP = TIMER_BaseInitParaStruct->TIMER_RepetitionCounter;
+        TIMERx->CREP = TIM_Base_InitTypeDefStruct->RepetitionCounter;
     }
     
     /* Generate an update event */
@@ -152,18 +152,18 @@ void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_BaseInitPara* TIMER_BaseInitP
 }
 
 /**
-  * @brief  Fills each TIMER_BaseInitPara Struct member with a default value.
-  * @param  TIMER_BaseInitPara: pointer to a TIMER_BaseInitPara structure.
+  * @brief  Fills each TIM_Base_InitTypeDef Struct member with a default value.
+  * @param  TIM_Base_InitTypeDef: pointer to a TIM_Base_InitTypeDef structure.
   * @retval None
   */
-void TIMER_BaseStructInit( TIMER_BaseInitPara* TIMER_BaseInitParaStruct)
+void TIMER_BaseStructInit( TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct)
 {
     /* Fill the default value */
-    TIMER_BaseInitParaStruct->TIMER_Period                = 0xFFFFFFFF;
-    TIMER_BaseInitParaStruct->TIMER_Prescaler             = 0x0000;
-    TIMER_BaseInitParaStruct->TIMER_ClockDivision         = TIMER_CDIV_DIV1;
-    TIMER_BaseInitParaStruct->TIMER_CounterMode           = TIMER_COUNTER_UP;
-    TIMER_BaseInitParaStruct->TIMER_RepetitionCounter     = 0x0000;
+    TIM_Base_InitTypeDefStruct->Period                = 0xFFFFFFFF;
+    TIM_Base_InitTypeDefStruct->Prescaler             = 0x0000;
+    TIM_Base_InitTypeDefStruct->ClockDivision         = TIMER_CDIV_DIV1;
+    TIM_Base_InitTypeDefStruct->CounterMode           = TIMER_COUNTER_UP;
+    TIM_Base_InitTypeDefStruct->RepetitionCounter     = 0x0000;
 }
 
 /**
@@ -176,7 +176,7 @@ void TIMER_BaseStructInit( TIMER_BaseInitPara* TIMER_BaseInitParaStruct)
   *     @arg TIMER_PSC_RELOAD_NOW       : The Prescaler is loaded right now.
   * @retval None
   */
-void TIMER_PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t TIMER_PSCReloadMode )
+void PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t TIMER_PSCReloadMode )
 {
     /* Set PSC */
     TIMERx->PSC = Prescaler;
@@ -188,7 +188,7 @@ void TIMER_PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t
 /**
   * @brief  Configure the TIMER Counter Mode
   * @param  TIMERx:  x ={ 1 , 2 , 3 } .
-  * @param  TIMER_CounterMode:  the Counter Mode 
+  * @param  CounterMode:  the Counter Mode 
   *   This value will be :
   *     @arg TIMER_COUNTER_UP             : Up Counting Mode
   *     @arg TIMER_COUNTER_DOWN           : Down Counting Mode
@@ -197,7 +197,7 @@ void TIMER_PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t
   *     @arg TIMER_COUNTER_CENTER_ALIGNED3: Center Aligned Counting Mode3
   * @retval None
   */
-void TIMER_CounterMode( TIMER_TypeDef* TIMERx , uint16_t TIMER_CounterMode )
+void CounterMode( TIMER_TypeDef* TIMERx , uint16_t CounterMode )
 {
     uint16_t tmpctlr1 = 0;
     
@@ -207,7 +207,7 @@ void TIMER_CounterMode( TIMER_TypeDef* TIMERx , uint16_t TIMER_CounterMode )
     tmpctlr1 &= (uint16_t)(~( ( uint16_t )( TIMER_CTLR1_DIR | TIMER_CTLR1_CAM )));
     
     /* Configures the Counter Mode */
-    tmpctlr1 |= TIMER_CounterMode;
+    tmpctlr1 |= CounterMode;
     
     /* Update the TIMER CTLR1 */
     TIMERx->CTLR1 = tmpctlr1;

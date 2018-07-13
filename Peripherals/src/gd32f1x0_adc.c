@@ -94,35 +94,35 @@
   */
 
 /**
-  * @brief  Reset the ADC interface and init the sturct ADC_InitPara .
-  * @param  ADC_InitParaStruct : the sturct ADC_InitPara pointer.
+  * @brief  Reset the ADC interface and init the sturct ADC_InitTypeDef .
+  * @param  ADC_InitTypeDefStruct : the sturct ADC_InitTypeDef pointer.
   * @retval None
   */
-void ADC_DeInit(ADC_InitPara* ADC_InitParaStruct)
+void ADC_DeInit(ADC_InitTypeDef* ADC_InitTypeDefStruct)
 {
     /* Enable ADC1 reset state */
     RCC_APB2PeriphReset_Enable(RCC_APB2PERIPH_ADC1RST, ENABLE);
     /* Release ADC1 from reset state */
     RCC_APB2PeriphReset_Enable(RCC_APB2PERIPH_ADC1RST, DISABLE);
     /* Reset ADC1 init structure parameters values */
-    /* Initialize the ADC_Mode_Scan member,disable scan mode */
-    ADC_InitParaStruct->ADC_Mode_Scan = DISABLE;
-    /* Initialize the ADC_Mode_Continuous member,disable continuous mode */
-    ADC_InitParaStruct->ADC_Mode_Continuous = DISABLE;
-    /* Initialize the ADC_Trig_External member,choose T1 CC1 as external trigger */
-    ADC_InitParaStruct->ADC_Trig_External = ADC_EXTERNAL_TRIGGER_MODE_T1_CC1;
-    /* Initialize the ADC_Data_Align member,specifies the ADC data alignment right */
-    ADC_InitParaStruct->ADC_Data_Align = ADC_DATAALIGN_RIGHT;
-    /* Initialize the ADC_Channel_Number member,only 1 channel */
-    ADC_InitParaStruct->ADC_Channel_Number = 1;
+    /* Initialize the ScanConvMode member,disable scan mode */
+    ADC_InitTypeDefStruct->ScanConvMode = DISABLE;
+    /* Initialize the ContinuousConvMode member,disable continuous mode */
+    ADC_InitTypeDefStruct->ContinuousConvMode = DISABLE;
+    /* Initialize the ExternalTrigConv member,choose T1 CC1 as external trigger */
+    ADC_InitTypeDefStruct->ExternalTrigConv = ADC_EXTERNAL_TRIGGER_MODE_T1_CC1;
+    /* Initialize the DataAlign member,specifies the ADC data alignment right */
+    ADC_InitTypeDefStruct->DataAlign = ADC_DATAALIGN_RIGHT;
+    /* Initialize the NbrOfConversion member,only 1 channel */
+    ADC_InitTypeDefStruct->NbrOfConversion = 1;
 }
 
 /**
   * @brief  Initialize the ADC1 interface parameters.
-  * @param  ADC_InitParaStruct: the sturct ADC_InitPara pointer.
+  * @param  ADC_InitTypeDefStruct: the sturct ADC_InitTypeDef pointer.
   * @retval None
   */
-void ADC_Init(ADC_InitPara* ADC_InitParaStruct)
+void ADC_Init(ADC_InitTypeDef* ADC_InitTypeDefStruct)
 {
     uint32_t temp1 = 0;
     uint8_t temp2 = 0;
@@ -132,8 +132,8 @@ void ADC_Init(ADC_InitPara* ADC_InitParaStruct)
     /* Clear SM bits */
     temp1 &= CTLR1_BITS_CLEAR;
     /* Configure ADC1: scan conversion mode */
-    /* Configure SCAN bit according to ADC_Mode_Scan value */
-    temp1 |= ((uint32_t)ADC_InitParaStruct->ADC_Mode_Scan << 8);
+    /* Configure SCAN bit according to ScanConvMode value */
+    temp1 |= ((uint32_t)ADC_InitTypeDefStruct->ScanConvMode << 8);
     /* Write new value to ADC1 CTLR1 */
     ADC1->CTLR1 = temp1;
 
@@ -143,11 +143,11 @@ void ADC_Init(ADC_InitPara* ADC_InitParaStruct)
     /* Clear CTN, DAL and ETSRC bits */
     temp1 &= CTLR2_BITS_CLEAR;
     /* Configure ADC1: external trigger mode select and continuous conversion mode */
-    /* Configure DAL bit according to ADC_Data_Align value */
-    /* Configure ETSRC bits according to ADC_Trig_External value */
-    /* Configure CTN bit according to ADC_Mode_Continuous value */
-    temp1 |= (uint32_t)(ADC_InitParaStruct->ADC_Data_Align | ADC_InitParaStruct->ADC_Trig_External |
-            ((uint32_t)ADC_InitParaStruct->ADC_Mode_Continuous << 1));
+    /* Configure DAL bit according to DataAlign value */
+    /* Configure ETSRC bits according to ExternalTrigConv value */
+    /* Configure CTN bit according to ContinuousConvMode value */
+    temp1 |= (uint32_t)(ADC_InitTypeDefStruct->DataAlign | ADC_InitTypeDefStruct->ExternalTrigConv |
+            ((uint32_t)ADC_InitTypeDefStruct->ContinuousConvMode << 1));
     /* Write new value to ADC1 CTLR2 */
     ADC1->CTLR2 = temp1;
 
@@ -157,8 +157,8 @@ void ADC_Init(ADC_InitPara* ADC_InitParaStruct)
     /* Clear RL bits */
     temp1 &= RSQ1_BITS_CLEAR;
     /* Configure ADC1: regular channel sequence length */
-    /* Configure RL bits according to ADC_Channel_Number value */
-    temp2 |= (uint8_t) (ADC_InitParaStruct->ADC_Channel_Number - (uint8_t)1);
+    /* Configure RL bits according to NbrOfConversion value */
+    temp2 |= (uint8_t) (ADC_InitTypeDefStruct->NbrOfConversion - (uint8_t)1);
     temp1 |= (uint32_t)temp2 << 20;
     /* Write new value to ADC1 RSQ1 */
     ADC1->RSQ1 = temp1;
