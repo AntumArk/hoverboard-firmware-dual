@@ -37,6 +37,7 @@ pb10 usart1 dma1 channel2/3
 
 #include "defines.h"
 #include "config.h"
+#include "gd32f1x0_timer.h"
 
 //TIM_HandleTypeDef htim_right;
 TIM_HandleTypeDef htim_left;

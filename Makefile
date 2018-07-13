@@ -73,7 +73,8 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--IInc \
+-ISrc/ \
+-IInc/ \
 -IDrivers/CMSIS/ \
 -IPeripherals/inc/
 
