@@ -78,8 +78,7 @@ typedef struct
   TIMER_TypeDef                 *Instance;     /*!< Register base address             */
   TIM_Base_InitTypeDef        Init;          /*!< TIM Time Base required parameters */
   HAL_TIM_ActiveChannel       Channel;       /*!< Active channel                    */
-  //DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array
-                                                This array is accessed by a @ref TIM_DMA_Handle_index */
+  //DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array, this array is accessed by a @ref TIM_DMA_Handle_index */
   //HAL_LockTypeDef             Lock;          /*!< Locking object                    */
   __IO HAL_TIM_StateTypeDef   State;         /*!< TIM operation state               */
 }TIM_HandleTypeDef;
