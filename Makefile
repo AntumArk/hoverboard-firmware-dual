@@ -19,10 +19,10 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Drivers/CMSIS/system_gd32f1x0.c \
-Peripherals/src/ \
-Src/ \
-core_cm3.c
+$(wildcard Src/*.c) \
+$(wildcard CMSIS/*.c) \
+core_cm3.c \
+$(wildcard Peripherals/src/*.c)
 
 # ASM sources
 ASM_SOURCES =  \
