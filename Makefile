@@ -103,7 +103,8 @@ C_INCLUDES =  \
 -IInc \
 -IDrivers/GD32F1x0_HAL_Driver/Inc \
 -IDrivers/GD32F1x0_HAL_Driver/Inc/Legacy \
--IDrivers/CMSIS
+-IDrivers/CMSIS \
+-IPeripherals/inc/
 
 
 # compile gcc flags
