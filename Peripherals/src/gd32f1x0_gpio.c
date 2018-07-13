@@ -232,9 +232,6 @@ void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t Pin, GPIO_PinState BitVal)
   * @brief  Toggle the selected data port bit.
   * @param  GPIOx: where x can be (A..F) to select the GPIO peripheral.
   * @param  Pin: where pin can be (GPIO_PIN_0..GPIO_PIN_15) to select the GPIO peripheral.
-  * @param  BitVal: specifies the state of the port.Select one of the follwing values :
-  *     @arg Bit_RESET: clear the port pin
-  *     @arg Bit_SET: set the port pin
   * @retval None
   */
 void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t Pin)
