@@ -107,10 +107,10 @@ void TIMER_DeInit( TIMER_TypeDef* TIMERx )
 /**
   * @brief  Initialize the specified Timer     
   * @param  TIMERx:  x ={ 1 , 2 , 3 , 6 , 14 , 15 , 16 , 17 } .
-  * @param  TIMER_Init: pointer to a TIM_Base_InitTypeDef structure.
+  * @param  TIMER_Init: pointer to a TIMER_Base_InitTypeDef structure.
   * @retval None
   */
-void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct)
+void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_Base_InitTypeDef* TIMER_Base_InitTypeDefStruct)
 {
     uint16_t tmpctlr1 = 0;
     
@@ -120,23 +120,23 @@ void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_Init
     {
         /* Configure the Counter Mode */
         tmpctlr1 &= (uint16_t)(~( ( uint16_t )( TIMER_CTLR1_DIR | TIMER_CTLR1_CAM)));
-        tmpctlr1 |= (uint32_t)TIM_Base_InitTypeDefStruct->CounterMode;
+        tmpctlr1 |= (uint32_t)TIMER_Base_InitTypeDefStruct->CounterMode;
     }
     
     if( TIMERx != TIMER6 )
     {
         /* Configure the clock division */
         tmpctlr1 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR1_CDIV));
-        tmpctlr1 |= (uint32_t)TIM_Base_InitTypeDefStruct->ClockDivision;
+        tmpctlr1 |= (uint32_t)TIMER_Base_InitTypeDefStruct->ClockDivision;
     }
     
     TIMERx->CTLR1 = tmpctlr1;
     
     /* Configure the Autoreload value */
-    TIMERx->CARL = TIM_Base_InitTypeDefStruct->Period ;
+    TIMERx->CARL = TIMER_Base_InitTypeDefStruct->Period ;
     
     /* Configure the Prescaler value */
-    TIMERx->PSC = TIM_Base_InitTypeDefStruct->Prescaler;
+    TIMERx->PSC = TIMER_Base_InitTypeDefStruct->Prescaler;
     
     if (( TIMERx == TIMER1)  || 
         ( TIMERx == TIMER15) || 
@@ -144,7 +144,7 @@ void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_Init
         ( TIMERx == TIMER17 ) )  
     {
         /* Configure the Repetition Counter value */
-        TIMERx->CREP = TIM_Base_InitTypeDefStruct->RepetitionCounter;
+        TIMERx->CREP = TIMER_Base_InitTypeDefStruct->RepetitionCounter;
     }
     
     /* Generate an update event */
@@ -152,18 +152,18 @@ void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_Init
 }
 
 /**
-  * @brief  Fills each TIM_Base_InitTypeDef Struct member with a default value.
-  * @param  TIM_Base_InitTypeDef: pointer to a TIM_Base_InitTypeDef structure.
+  * @brief  Fills each TIMER_Base_InitTypeDef Struct member with a default value.
+  * @param  TIMER_Base_InitTypeDef: pointer to a TIMER_Base_InitTypeDef structure.
   * @retval None
   */
-void TIMER_BaseStructInit( TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct)
+void TIMER_BaseStructInit( TIMER_Base_InitTypeDef* TIMER_Base_InitTypeDefStruct)
 {
     /* Fill the default value */
-    TIM_Base_InitTypeDefStruct->Period                = 0xFFFFFFFF;
-    TIM_Base_InitTypeDefStruct->Prescaler             = 0x0000;
-    TIM_Base_InitTypeDefStruct->ClockDivision         = TIMER_CDIV_DIV1;
-    TIM_Base_InitTypeDefStruct->CounterMode           = TIMER_COUNTER_UP;
-    TIM_Base_InitTypeDefStruct->RepetitionCounter     = 0x0000;
+    TIMER_Base_InitTypeDefStruct->Period                = 0xFFFFFFFF;
+    TIMER_Base_InitTypeDefStruct->Prescaler             = 0x0000;
+    TIMER_Base_InitTypeDefStruct->ClockDivision         = TIMER_CDIV_DIV1;
+    TIMER_Base_InitTypeDefStruct->CounterMode           = TIMER_COUNTER_UP;
+    TIMER_Base_InitTypeDefStruct->RepetitionCounter     = 0x0000;
 }
 
 /**
@@ -435,12 +435,12 @@ void TIMER_CtrlPWMOutputs( TIMER_TypeDef* TIMERx , TypeState NewValue )
 }
 
 /**
-  * @brief  Initialize the TIMERx Channel1 with TIM_OC_InitTypeDef .
+  * @brief  Initialize the TIMERx Channel1 with TIMER_OC_InitTypeDef .
   * @param  TIMERx:  x ={ 1 , 2 , 3 , 14 , 15 , 16 , 17 } .
-  * @param  TIM_OC_InitTypeDefStruct : pointer to a TIM_OC_InitTypeDef structure .
+  * @param  TIMER_OC_InitTypeDefStruct : pointer to a TIMER_OC_InitTypeDef structure .
   * @retval None
   */
-void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct)
+void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct)
 {
     uint16_t tmpchctlrx = 0, tmpche = 0, tmpctlr2 = 0;
     
@@ -461,16 +461,16 @@ void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     tmpchctlrx &= (uint16_t)(~( ( uint16_t )TIMER_CHCTLR1_CH1M));
     
     /* Select the Output Compare Mode */
-    tmpchctlrx |= TIM_OC_InitTypeDefStruct->OCMode;
+    tmpchctlrx |= TIMER_OC_InitTypeDefStruct->OCMode;
     
     /* Reset the Output Polarity */
     tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH1P));
     
     /* Set the Output Compare Polarity */
-    tmpche |= TIM_OC_InitTypeDefStruct->OCPolarity;
+    tmpche |= TIMER_OC_InitTypeDefStruct->OCPolarity;
     
     /* Set the Output State */
-    tmpche |= TIM_OC_InitTypeDefStruct->TIMER_OutputState;
+    tmpche |= TIMER_OC_InitTypeDefStruct->TIMER_OutputState;
     
     if(( TIMERx == TIMER1) || ( TIMERx == TIMER15) || ( TIMERx == TIMER16) || ( TIMERx == TIMER17))
     {
@@ -478,23 +478,23 @@ void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
         tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH1NP));
         
         /* Set the Output complementary Polarity */
-        tmpche |= TIM_OC_InitTypeDefStruct->OCNPolarity;
+        tmpche |= TIMER_OC_InitTypeDefStruct->OCNPolarity;
         
         /* Reset the Output complementary State */
         tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH1NE));    
         
         /* Set the Output complementary State */
-        tmpche |= TIM_OC_InitTypeDefStruct->TIMER_OutputNState;
+        tmpche |= TIMER_OC_InitTypeDefStruct->TIMER_OutputNState;
         
         /* Reset the Ouput Compare and Output Compare complementary IDLE State */
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO1));
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO1N));
         
         /* Set the Output Idle state */
-        tmpctlr2 |= TIM_OC_InitTypeDefStruct->OCIdleState;
+        tmpctlr2 |= TIMER_OC_InitTypeDefStruct->OCIdleState;
         
         /* Set the Output complementary Idle state */
-        tmpctlr2 |= TIM_OC_InitTypeDefStruct->OCNIdleState;
+        tmpctlr2 |= TIMER_OC_InitTypeDefStruct->OCNIdleState;
     }
 
     /* Write to TIMERx CTLR2 */
@@ -504,19 +504,19 @@ void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     TIMERx->CHCTLR1 = tmpchctlrx;
     
     /* Set the Capture / Compare Register value */
-    TIMERx->CHCC1 = TIM_OC_InitTypeDefStruct->Pulse; 
+    TIMERx->CHCC1 = TIMER_OC_InitTypeDefStruct->Pulse; 
     
     /* Write to TIMERx CHE */
     TIMERx->CHE = tmpche;
 }
 
 /**
-  * @brief  Initialize the TIMERx Channel2 with TIM_OC_InitTypeDef .
+  * @brief  Initialize the TIMERx Channel2 with TIMER_OC_InitTypeDef .
   * @param  TIMERx:  x ={ 1 , 2 , 3 , 15 } .
-  * @param  TIM_OC_InitTypeDefStruct : pointer to a TIM_OC_InitTypeDef structure .
+  * @param  TIMER_OC_InitTypeDefStruct : pointer to a TIMER_OC_InitTypeDef structure .
   * @retval None
   */
-void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct)
+void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct)
 {
     uint16_t tmpchctlrx = 0, tmpche = 0, tmpctlr2 = 0;
     
@@ -537,16 +537,16 @@ void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     tmpchctlrx &= (uint16_t)(~( ( uint16_t )TIMER_CHCTLR1_CH2M));
     
     /* Select the Output Compare Mode */
-    tmpchctlrx |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCMode << 8);
+    tmpchctlrx |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCMode << 8);
     
     /* Reset the Output Polarity */
     tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH2P));
     
     /* Set the Output Compare Polarity */
-    tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCPolarity << 4);
+    tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCPolarity << 4);
     
     /* Set the Output State */
-    tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->TIMER_OutputState << 4);
+    tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->TIMER_OutputState << 4);
     
     if( TIMERx == TIMER1)
     {
@@ -554,23 +554,23 @@ void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
         tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH2NP));
         
         /* Set the Output complementary Polarity */
-        tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCNPolarity << 4);
+        tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCNPolarity << 4);
         
         /* Reset the Output complementary State */
         tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH2NE));    
         
         /* Set the Output complementary State */
-        tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->TIMER_OutputNState << 4);
+        tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->TIMER_OutputNState << 4);
             
         /* Reset the Ouput Compare and Output Compare complementary IDLE State */
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO2));
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO2N));
         
         /* Set the Output Idle state */
-        tmpctlr2 |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCIdleState << 2);
+        tmpctlr2 |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCIdleState << 2);
         
         /* Set the Output complementary Idle state */
-        tmpctlr2 |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCNIdleState << 2);
+        tmpctlr2 |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCNIdleState << 2);
     }
 
     /* Write to TIMERx CTLR2 */
@@ -580,19 +580,19 @@ void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     TIMERx->CHCTLR1 = tmpchctlrx;
     
     /* Set the Capture / Compare Register value */
-    TIMERx->CHCC2 = TIM_OC_InitTypeDefStruct->Pulse;
+    TIMERx->CHCC2 = TIMER_OC_InitTypeDefStruct->Pulse;
     
     /* Write to TIMERx CHE */
     TIMERx->CHE = tmpche;
 }
 
 /**
-  * @brief  Initialize the TIMERx Channel3 with TIM_OC_InitTypeDef .
+  * @brief  Initialize the TIMERx Channel3 with TIMER_OC_InitTypeDef .
   * @param  TIMERx:  x ={ 1 , 2 , 3 } .
-  * @param  TIM_OC_InitTypeDefStruct : pointer to a TIM_OC_InitTypeDef structure .
+  * @param  TIMER_OC_InitTypeDefStruct : pointer to a TIMER_OC_InitTypeDef structure .
   * @retval None
   */
-void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct)
+void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct)
 {
     uint16_t tmpchctlrx = 0, tmpche = 0, tmpctlr2 = 0;
     
@@ -613,16 +613,16 @@ void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     tmpchctlrx &= (uint16_t)(~( ( uint16_t )TIMER_CHCTLR2_CH3M));  
     
     /* Select the Output Compare Mode */
-    tmpchctlrx |= TIM_OC_InitTypeDefStruct->OCMode;
+    tmpchctlrx |= TIMER_OC_InitTypeDefStruct->OCMode;
     
     /* Reset the Output Polarity */
     tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH3P));
     
     /* Set the Output Compare Polarity */
-    tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCPolarity << 8);
+    tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCPolarity << 8);
     
     /* Set the Output State */
-    tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->TIMER_OutputState << 8);
+    tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->TIMER_OutputState << 8);
     
     if( TIMERx == TIMER1)
     {  
@@ -630,23 +630,23 @@ void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
         tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH3NP));
         
         /* Set the Output complementary Polarity */
-        tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCNPolarity << 8);
+        tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCNPolarity << 8);
         
         /* Reset the Output complementary State */
         tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH3NE));
         
         /* Set the Output complementary State */
-        tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->TIMER_OutputNState << 8);
+        tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->TIMER_OutputNState << 8);
         
         /* Reset the Ouput Compare and Output Compare complementary IDLE State */
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO3));
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO3N));
         
         /* Set the Output Idle state */
-        tmpctlr2 |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCIdleState << 4);
+        tmpctlr2 |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCIdleState << 4);
         
         /* Set the Output complementary Idle state */
-        tmpctlr2 |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCNIdleState << 4);
+        tmpctlr2 |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCNIdleState << 4);
     }
 
     /* Write to TIMERx CTLR2 */
@@ -656,19 +656,19 @@ void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     TIMERx->CHCTLR2 = tmpchctlrx;
     
     /* Set the Capture / Compare Register value */
-    TIMERx->CHCC3 = TIM_OC_InitTypeDefStruct->Pulse;
+    TIMERx->CHCC3 = TIMER_OC_InitTypeDefStruct->Pulse;
     
     /* Write to TIMERx CHE */
     TIMERx->CHE = tmpche;
 }
 
 /**
-  * @brief  Initialize the TIMERx Channel4 with TIM_OC_InitTypeDef .
+  * @brief  Initialize the TIMERx Channel4 with TIMER_OC_InitTypeDef .
   * @param  TIMERx:  x ={ 1 , 2 , 3 } .
-  * @param  TIM_OC_InitTypeDefStruct : pointer to a TIM_OC_InitTypeDef structure .
+  * @param  TIMER_OC_InitTypeDefStruct : pointer to a TIMER_OC_InitTypeDef structure .
   * @retval None
   */
-void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct)
+void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct)
 {
     uint16_t tmpchctlrx = 0, tmpche = 0, tmpctlr2 = 0;
     
@@ -689,16 +689,16 @@ void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     tmpchctlrx &= (uint16_t)(~( ( uint16_t )TIMER_CHCTLR2_CH4M));
     
     /* Select the Output Compare Mode */
-    tmpchctlrx |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCMode << 8);
+    tmpchctlrx |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCMode << 8);
     
     /* Reset the Output Polarity */
     tmpche &= (uint16_t)(~( ( uint16_t )TIMER_CHE_CH4P));
     
     /* Set the Output Compare Polarity */
-    tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCPolarity << 12);
+    tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCPolarity << 12);
     
     /* Set the Output State */
-    tmpche |= (uint16_t)( TIM_OC_InitTypeDefStruct->TIMER_OutputState << 12);
+    tmpche |= (uint16_t)( TIMER_OC_InitTypeDefStruct->TIMER_OutputState << 12);
     
     if( TIMERx == TIMER1)
     {
@@ -706,7 +706,7 @@ void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
         tmpctlr2 &= (uint16_t)(~( ( uint16_t )TIMER_CTLR2_ISO4));
         
         /* Set the Output Idle state */
-        tmpctlr2 |= (uint16_t)( TIM_OC_InitTypeDefStruct->OCIdleState << 6);
+        tmpctlr2 |= (uint16_t)( TIMER_OC_InitTypeDefStruct->OCIdleState << 6);
     }
     
     /* Write to TIMERx CTLR2 */
@@ -716,27 +716,27 @@ void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitType
     TIMERx->CHCTLR2 = tmpchctlrx;
     
     /* Set the Capture Compare Register value */
-    TIMERx->CHCC4 = TIM_OC_InitTypeDefStruct->Pulse;
+    TIMERx->CHCC4 = TIMER_OC_InitTypeDefStruct->Pulse;
     
     /* Write to TIMERx CHE */
     TIMERx->CHE = tmpche;
 }
 
 /**
-  * @brief  Fill TIM_OC_InitTypeDef member with default value.
-  * @param  TIM_OC_InitTypeDefStruct: pointer to a TIM_OC_InitTypeDef structure.
+  * @brief  Fill TIMER_OC_InitTypeDef member with default value.
+  * @param  TIMER_OC_InitTypeDefStruct: pointer to a TIMER_OC_InitTypeDef structure.
   * @retval None
   */
-void TIMER_OCStructInit( TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct )
+void TIMER_OCStructInit( TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct )
 {
-    TIM_OC_InitTypeDefStruct->OCMode         = TIMER_OC_MODE_TIMING;
-    TIM_OC_InitTypeDefStruct->TIMER_OutputState    = TIMER_OUTPUT_STATE_DISABLE;
-    TIM_OC_InitTypeDefStruct->TIMER_OutputNState   = TIMER_OUTPUTN_STATE_DISABLE;
-    TIM_OC_InitTypeDefStruct->Pulse          = 0x0000000;
-    TIM_OC_InitTypeDefStruct->OCPolarity     = TIMER_OC_POLARITY_HIGH;
-    TIM_OC_InitTypeDefStruct->OCNPolarity    = TIMER_OC_POLARITY_HIGH;
-    TIM_OC_InitTypeDefStruct->OCIdleState    = TIMER_OC_IDLE_STATE_RESET;
-    TIM_OC_InitTypeDefStruct->OCNIdleState   = TIMER_OCN_IDLE_STATE_RESET;
+    TIMER_OC_InitTypeDefStruct->OCMode         = TIMER_OC_MODE_TIMING;
+    TIMER_OC_InitTypeDefStruct->TIMER_OutputState    = TIMER_OUTPUT_STATE_DISABLE;
+    TIMER_OC_InitTypeDefStruct->TIMER_OutputNState   = TIMER_OUTPUTN_STATE_DISABLE;
+    TIMER_OC_InitTypeDefStruct->Pulse          = 0x0000000;
+    TIMER_OC_InitTypeDefStruct->OCPolarity     = TIMER_OC_POLARITY_HIGH;
+    TIMER_OC_InitTypeDefStruct->OCNPolarity    = TIMER_OC_POLARITY_HIGH;
+    TIMER_OC_InitTypeDefStruct->OCIdleState    = TIMER_OC_IDLE_STATE_RESET;
+    TIMER_OC_InitTypeDefStruct->OCNIdleState   = TIMER_OCN_IDLE_STATE_RESET;
 }
 
 /**

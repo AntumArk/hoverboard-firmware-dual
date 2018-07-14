@@ -88,4 +88,20 @@
 #define IFCR         		  IFR
 
 
+#define CCR                   CTLRx
+#define CNDTR                 RCNTx
+#define CPAR                  PBARx
+#define CMAR                  MBARx
+
+
+#define TIMER_COUNTERMODE_CENTERALIGNED1 TIMER_COUNTER_CENTER_ALIGNED1
+#define TIMER_CLOCKDIVISION_DIV1         TIMER_CDIV_DIV1
+#define TIMER_AUTORELOAD_PRELOAD_DISABLE TIMER_OC_PRELOAD_DISABLE
+#define TIMER_MASTERSLAVEMODE_ENABLE     TIMER_MASTER_SLAVE_MODE_ENABLE
+
+#define TIMER_CR2_MMS_1                  TIMER_CTLR2_MMC_1
+
+
+#define USART1->DR                       USART1->RDTR
+
 #endif

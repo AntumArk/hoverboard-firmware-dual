@@ -7,7 +7,7 @@
 #include <string.h>
 
 #ifdef CONTROL_PPM
-TIM_HandleTypeDef TimHandle;
+TIMER_HandleTypeDef TimHandle;
 uint8_t ppm_count = 0;
 #endif
 
@@ -78,15 +78,15 @@ void PPM_Init() {
   __HAL_RCC_TIM2_CLK_ENABLE();
   TimHandle.Instance = TIM2;
   TimHandle.Init.Period = UINT16_MAX;
-  TimHandle.Init.Prescaler = (SystemCoreClock/DELAY_TIM_FREQUENCY_US)-1;;
+  TimHandle.Init.Prescaler = (SystemCoreClock/DELAY_TIMER_FREQUENCY_US)-1;;
   TimHandle.Init.ClockDivision = 0;
-  TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
-  HAL_TIM_Base_Init(&TimHandle);
+  TimHandle.Init.CounterMode = TIMER_COUNTERMODE_UP;
+  HAL_TIMER_Base_Init(&TimHandle);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-  HAL_TIM_Base_Start(&TimHandle);
+  HAL_TIMER_Base_Start(&TimHandle);
 }
 #endif
 

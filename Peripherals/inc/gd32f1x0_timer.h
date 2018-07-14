@@ -18,7 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gd32f1x0.h"
-#include "stm32f1xx_hal_def.h"
+//#include "stm32f1xx_hal_def.h"
 //#include "gd32f1x0_dma.h"
 
 /** @addtogroup GD32F1x0_Firmware
@@ -46,31 +46,32 @@ typedef struct
     uint16_t ClockDivision;                   /*!< Clock division , 
                                                          a value of @ref TIMER_Clock_Division_CDIV. */
     uint8_t  RepetitionCounter;               /*!< Repetition counter value , only valid in TIMER1/15/16/17. */
-} TIM_Base_InitTypeDef;       
+	uint32_t AutoReloadPreload;  /*!< Specifies the auto-reload preload : this parameter can be a value of @ref TIM_AutoReloadPreload */
+} TIMER_Base_InitTypeDef;       
 
 /**
   * @brief  HAL State structures definition
   */
 typedef enum
 {
-  HAL_TIM_STATE_RESET             = 0x00U,    /*!< Peripheral not yet initialized or disabled  */
-  HAL_TIM_STATE_READY             = 0x01U,    /*!< Peripheral Initialized and ready for use    */
-  HAL_TIM_STATE_BUSY              = 0x02U,    /*!< An internal process is ongoing              */
-  HAL_TIM_STATE_TIMEOUT           = 0x03U,    /*!< Timeout state                               */
-  HAL_TIM_STATE_ERROR             = 0x04U     /*!< Reception process is ongoing                */
-}HAL_TIM_StateTypeDef;
+  HAL_TIMER_STATE_RESET             = 0x00U,    /*!< Peripheral not yet initialized or disabled  */
+  HAL_TIMER_STATE_READY             = 0x01U,    /*!< Peripheral Initialized and ready for use    */
+  HAL_TIMER_STATE_BUSY              = 0x02U,    /*!< An internal process is ongoing              */
+  HAL_TIMER_STATE_TIMEOUT           = 0x03U,    /*!< Timeout state                               */
+  HAL_TIMER_STATE_ERROR             = 0x04U     /*!< Reception process is ongoing                */
+}HAL_TIMER_StateTypeDef;
 
 /**
   * @brief  HAL Active channel structures definition
   */
 typedef enum
 {
-  HAL_TIM_ACTIVE_CHANNEL_1        = 0x01U,    /*!< The active channel is 1     */
-  HAL_TIM_ACTIVE_CHANNEL_2        = 0x02U,    /*!< The active channel is 2     */
-  HAL_TIM_ACTIVE_CHANNEL_3        = 0x04U,    /*!< The active channel is 3     */
-  HAL_TIM_ACTIVE_CHANNEL_4        = 0x08U,    /*!< The active channel is 4     */
-  HAL_TIM_ACTIVE_CHANNEL_CLEARED  = 0x00U     /*!< All active channels cleared */
-}HAL_TIM_ActiveChannel;
+  HAL_TIMER_ACTIVE_CHANNEL_1        = 0x01U,    /*!< The active channel is 1     */
+  HAL_TIMER_ACTIVE_CHANNEL_2        = 0x02U,    /*!< The active channel is 2     */
+  HAL_TIMER_ACTIVE_CHANNEL_3        = 0x04U,    /*!< The active channel is 3     */
+  HAL_TIMER_ACTIVE_CHANNEL_4        = 0x08U,    /*!< The active channel is 4     */
+  HAL_TIMER_ACTIVE_CHANNEL_CLEARED  = 0x00U     /*!< All active channels cleared */
+}HAL_TIMER_ActiveChannel;
 
 /**
   * @brief  TIM Time Base Handle Structure definition
@@ -78,12 +79,12 @@ typedef enum
 typedef struct
 {
   TIMER_TypeDef                 *Instance;     /*!< Register base address             */
-  TIM_Base_InitTypeDef        Init;          /*!< TIM Time Base required parameters */
-  HAL_TIM_ActiveChannel       Channel;       /*!< Active channel                    */
-  //DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array, this array is accessed by a @ref TIM_DMA_Handle_index */ // TO FIX : Strange bug, say DMA_HandleTypeDef not defined...
+  TIMER_Base_InitTypeDef        Init;          /*!< TIM Time Base required parameters */
+  HAL_TIMER_ActiveChannel       Channel;       /*!< Active channel                    */
+  //DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array, this array is accessed by a @ref TIMER_DMA_Handle_index */ // TO FIX : Strange bug, say DMA_HandleTypeDef not defined...
   //HAL_LockTypeDef             Lock;          /*!< Locking object                    */
-  __IO HAL_TIM_StateTypeDef   State;         /*!< TIM operation state               */
-}TIM_HandleTypeDef;
+  __IO HAL_TIMER_StateTypeDef   State;         /*!< TIM operation state               */
+}TIMER_HandleTypeDef;
 
 /**
   * @}
@@ -114,7 +115,7 @@ typedef struct
     uint16_t OCNIdleState;                    /*!< TIM Complementary Output Compare pin state during Idle state.
                                                          a value of @ref TIMER_Output_Compare_N_Idle_State , 
                                                          valid only for TIMER1. */
-} TIM_OC_InitTypeDef;
+} TIMER_OC_InitTypeDef;
 
 /** 
   * @brief   Timer input capture init structure
@@ -719,16 +720,16 @@ typedef struct
 {
 
   uint32_t IC1Polarity;            /*!< Specifies the active edge of the input signal.
-                                        This parameter can be a value of @ref TIM_Input_Capture_Polarity */
+                                        This parameter can be a value of @ref TIMER_Input_Capture_Polarity */
 
   uint32_t IC1Prescaler;        /*!< Specifies the Input Capture Prescaler.
-                                     This parameter can be a value of @ref TIM_Input_Capture_Prescaler */
+                                     This parameter can be a value of @ref TIMER_Input_Capture_Prescaler */
 
   uint32_t IC1Filter;           /*!< Specifies the input capture filter.
                                      This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF */  
   uint32_t Commutation_Delay;  /*!< Specifies the pulse value to be loaded into the Capture Compare Register. 
                                     This parameter can be a number between Min_Data = 0x0000 and Max_Data = 0xFFFF */
-} TIM_HallSensor_InitTypeDef;
+} TIMER_HallSensor_InitTypeDef;
 
 
 #if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
@@ -741,20 +742,20 @@ typedef struct
 typedef struct
 {
   uint32_t OffStateRunMode;       /*!< TIM off state in run mode
-                                     This parameter can be a value of @ref TIM_OSSR_Off_State_Selection_for_Run_mode_state */
+                                     This parameter can be a value of @ref TIMER_OSSR_Off_State_Selection_for_Run_mode_state */
   uint32_t OffStateIDLEMode;      /*!< TIM off state in IDLE mode
-                                     This parameter can be a value of @ref TIM_OSSI_Off_State_Selection_for_Idle_mode_state */
+                                     This parameter can be a value of @ref TIMER_OSSI_Off_State_Selection_for_Idle_mode_state */
   uint32_t LockLevel;             /*!< TIM Lock level
-                                     This parameter can be a value of @ref TIM_Lock_level */                             
+                                     This parameter can be a value of @ref TIMER_Lock_level */                             
   uint32_t DeadTime;              /*!< TIM dead Time 
                                      This parameter can be a number between Min_Data = 0x00 and Max_Data = 0xFF */
   uint32_t BreakState;            /*!< TIM Break State 
-                                     This parameter can be a value of @ref TIM_Break_Input_enable_disable */
+                                     This parameter can be a value of @ref TIMER_Break_Input_enable_disable */
   uint32_t BreakPolarity;         /*!< TIM Break input polarity 
-                                     This parameter can be a value of @ref TIM_Break_Polarity */
+                                     This parameter can be a value of @ref TIMER_Break_Polarity */
   uint32_t AutomaticOutput;       /*!< TIM Automatic Output Enable state 
-                                     This parameter can be a value of @ref TIM_AOE_Bit_Set_Reset */           
-} TIM_BreakDeadTimeConfigTypeDef;
+                                     This parameter can be a value of @ref TIMER_AOE_Bit_Set_Reset */           
+} TIMER_BreakDeadTimeConfigTypeDef;
 
 #endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
        /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
@@ -765,10 +766,42 @@ typedef struct
   */ 
 typedef struct {
   uint32_t  MasterOutputTrigger;   /*!< Trigger output (TRGO) selection 
-                                      This parameter can be a value of @ref TIM_Master_Mode_Selection */ 
+                                      This parameter can be a value of @ref TIMER_Master_Mode_Selection */ 
   uint32_t  MasterSlaveMode;       /*!< Master/slave mode selection 
-                                      This parameter can be a value of @ref TIM_Master_Slave_Mode */
-}TIM_MasterConfigTypeDef;
+                                      This parameter can be a value of @ref TIMER_Master_Slave_Mode */
+}TIMER_MasterConfigTypeDef;
+
+/**
+  * @brief  TIM Slave configuration Structure definition
+  */
+typedef struct {
+  uint32_t  SlaveMode;      /*!< Slave mode selection
+                               This parameter can be a value of @ref TIMER_Slave_Mode */
+  uint32_t  InputTrigger;      /*!< Input Trigger source
+                                  This parameter can be a value of @ref TIMER_Trigger_Selection */
+  uint32_t  TriggerPolarity;   /*!< Input Trigger polarity
+                                  This parameter can be a value of @ref TIMER_Trigger_Polarity */
+  uint32_t  TriggerPrescaler;  /*!< Input trigger prescaler
+                                  This parameter can be a value of @ref TIMER_Trigger_Prescaler */
+  uint32_t  TriggerFilter;     /*!< Input trigger filter
+                                  This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF */
+
+}TIMER_SlaveConfigTypeDef;
+
+/** @defgroup TIMER_Master_Mode_Selection TIM Master Mode Selection
+  * @{
+  */
+#define	TIMER_TRGO_RESET            0x00000000U
+#define	TIMER_TRGO_ENABLE           (TIMER_CR2_MMS_0)
+#define	TIMER_TRGO_UPDATE           (TIMER_CR2_MMS_1)
+#define	TIMER_TRGO_OC1              ((TIMER_CR2_MMS_1 | TIMER_CR2_MMS_0))
+#define	TIMER_TRGO_OC1REF           (TIMER_CR2_MMS_2)
+#define	TIMER_TRGO_OC2REF           ((TIMER_CR2_MMS_2 | TIMER_CR2_MMS_0))
+#define	TIMER_TRGO_OC3REF           ((TIMER_CR2_MMS_2 | TIMER_CR2_MMS_1))
+#define	TIMER_TRGO_OC4REF           ((TIMER_CR2_MMS_2 | TIMER_CR2_MMS_1 | TIMER_CR2_MMS_0))
+/**
+  * @}
+  */
 
 /**
   * @}
@@ -785,7 +818,7 @@ typedef struct {
 /** @defgroup TIMEx_Clock_Filter TIMEx Clock Filter
   * @{
   */
-#define IS_TIM_DEADTIME(DEADTIME)      ((DEADTIME) <= 0xFFU)          /*!< BreakDead Time */
+#define IS_TIMER_DEADTIME(DEADTIME)      ((DEADTIME) <= 0xFFU)          /*!< BreakDead Time */
 /**
   * @}
   */
@@ -803,42 +836,42 @@ typedef struct {
   * @param  __HANDLE__: TIM handle.
   * @param  __CHANNEL__: TIM Channels to be configured.
   *          This parameter can be one of the following values:
-  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
-  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
-  *            @arg TIM_CHANNEL_3: TIM Channel 3 selected
-  *            @arg TIM_CHANNEL_4: TIM Channel 4 selected
+  *            @arg TIMER_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIMER_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIMER_CHANNEL_3: TIM Channel 3 selected
+  *            @arg TIMER_CHANNEL_4: TIM Channel 4 selected
   * @retval None
   */
-#define __HAL_TIM_ENABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
-        (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 |= TIM_CCMR1_OC1PE) :\
-         ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 |= TIM_CCMR1_OC2PE) :\
-         ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 |= TIM_CCMR2_OC3PE) :\
-         ((__HANDLE__)->Instance->CCMR2 |= TIM_CCMR2_OC4PE))
+#define __HAL_TIMER_ENABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
+        (((__CHANNEL__) == TIMER_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 |= TIMER_CCMR1_OC1PE) :\
+         ((__CHANNEL__) == TIMER_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 |= TIMER_CCMR1_OC2PE) :\
+         ((__CHANNEL__) == TIMER_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 |= TIMER_CCMR2_OC3PE) :\
+         ((__HANDLE__)->Instance->CCMR2 |= TIMER_CCMR2_OC4PE))
 
 /**
   * @brief  Resets the TIM Output compare preload.
   * @param  __HANDLE__: TIM handle.
   * @param  __CHANNEL__: TIM Channels to be configured.
   *          This parameter can be one of the following values:
-  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
-  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
-  *            @arg TIM_CHANNEL_3: TIM Channel 3 selected
-  *            @arg TIM_CHANNEL_4: TIM Channel 4 selected
+  *            @arg TIMER_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIMER_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIMER_CHANNEL_3: TIM Channel 3 selected
+  *            @arg TIMER_CHANNEL_4: TIM Channel 4 selected
   * @retval None
   */
-#define __HAL_TIM_DISABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
-        (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= (uint16_t)~TIM_CCMR1_OC1PE) :\
-         ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= (uint16_t)~TIM_CCMR1_OC2PE) :\
-         ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= (uint16_t)~TIM_CCMR2_OC3PE) :\
-         ((__HANDLE__)->Instance->CCMR2 &= (uint16_t)~TIM_CCMR2_OC4PE))
+#define __HAL_TIMER_DISABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
+        (((__CHANNEL__) == TIMER_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= (uint16_t)~TIMER_CCMR1_OC1PE) :\
+         ((__CHANNEL__) == TIMER_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= (uint16_t)~TIMER_CCMR1_OC2PE) :\
+         ((__CHANNEL__) == TIMER_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= (uint16_t)~TIMER_CCMR2_OC3PE) :\
+         ((__HANDLE__)->Instance->CCMR2 &= (uint16_t)~TIMER_CCMR2_OC4PE))
   
 /** @defgroup TIMER_Exported_Functions
   * @{
   */
 /* TimeBase management ********************************************************/
 void TIMER_DeInit( TIMER_TypeDef* TIMERx );
-void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct);
-void TIMER_BaseStructInit( TIM_Base_InitTypeDef* TIM_Base_InitTypeDefStruct);
+void TIMER_BaseInit( TIMER_TypeDef* TIMERx , TIMER_Base_InitTypeDef* TIMER_Base_InitTypeDefStruct);
+void TIMER_BaseStructInit( TIMER_Base_InitTypeDef* TIMER_Base_InitTypeDefStruct);
 void PrescalerConfig( TIMER_TypeDef* TIMERx , uint16_t Prescaler, uint16_t TIMER_PSCReloadMode );
 void CounterMode( TIMER_TypeDef* TIMERx , uint16_t CounterMode);
 void TIMER_SetCounter( TIMER_TypeDef* TIMERx , uint32_t Counter);
@@ -858,11 +891,11 @@ void TIMER_BKDTStructInit( TIMER_BKDTInitPara* TIMER_BKDTInitParaStruct);
 void TIMER_CtrlPWMOutputs( TIMER_TypeDef* TIMERx , TypeState NewValue);
 
 /* Output Compare management **************************************************/
-void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct);
-void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
-void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
-void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
-void TIMER_OCStructInit( TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
+void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct);
+void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct );
+void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct );
+void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct );
+void TIMER_OCStructInit( TIMER_OC_InitTypeDef* TIMER_OC_InitTypeDefStruct );
 void TIMER_OCxModeConfig( TIMER_TypeDef* TIMERx , uint16_t TIMER_Ch, uint16_t OCMode );
 void TIMER_Compare1Config( TIMER_TypeDef* TIMERx , uint32_t CompValue1 );
 void TIMER_Compare2Config( TIMER_TypeDef* TIMERx , uint32_t CompValue2 );

@@ -22,7 +22,7 @@
 #pragma once
 
 void MX_GPIO_Init(void);
-void MX_TIM_Init(void);
+void MX_TIMER_Init(void);
 void MX_ADC1_Init(void);
 void MX_ADC2_Init(void);
 void UART_Init(void);

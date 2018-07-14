@@ -29,8 +29,8 @@
 
 void SystemClock_Config(void);
 
-extern TIM_HandleTypeDef htim_left;
-extern TIM_HandleTypeDef htim_right;
+extern TIMER_HandleTypeDef hTIMER_left;
+extern TIMER_HandleTypeDef hTIMER_right;
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern volatile adc_buf_t adc_buffer;
@@ -104,7 +104,7 @@ int main(void) {
 
   __HAL_RCC_DMA1_CLK_DISABLE();
   MX_GPIO_Init();
-  MX_TIM_Init();
+  MX_TIMER_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
 
