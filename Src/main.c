@@ -19,7 +19,9 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gd32f1x0_hal.h"
+#include <stdint.h>
+#include "gd32f1x0.h"
+#include "gd32f1x0_stm32_compat.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"

@@ -44,7 +44,9 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-//#include "stm32f1xx_hal_def.h"
+#include <stdint.h>
+#include "stm32f1xx_hal_def.h"
+#include "gd32f1x0_usart.h"
 
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
@@ -174,11 +176,11 @@ typedef struct
 
   __IO uint16_t                 RxXferCount;      /*!< UART Rx Transfer Counter           */
 
-  DMA_HandleTypeDef             *hdmatx;          /*!< UART Tx DMA Handle parameters      */
+  //DMA_HandleTypeDef             *hdmatx;          /*!< UART Tx DMA Handle parameters      */ // TO FIX : Strange bug, say DMA_HandleTypeDef not defined...
 
-  DMA_HandleTypeDef             *hdmarx;          /*!< UART Rx DMA Handle parameters      */
+  //DMA_HandleTypeDef             *hdmarx;          /*!< UART Rx DMA Handle parameters      */ // TO FIX : Strange bug, say DMA_HandleTypeDef not defined...
 
-  HAL_LockTypeDef               Lock;             /*!< Locking object                     */
+  //HAL_LockTypeDef               Lock;             /*!< Locking object                     */
 
   __IO HAL_UART_StateTypeDef    gState;           /*!< UART state information related to global Handle management 
                                                        and also related to Tx operations.

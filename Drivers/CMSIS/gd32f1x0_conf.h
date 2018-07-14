@@ -13,12 +13,12 @@
 #define __GD32F1X0_CONF_H
 
 /* Includes ------------------------------------------------------------------*/
+#include "gd32f1x0_dma.h"
 #include "gd32f1x0_adc.h"
 #include "gd32f1x0_cec.h"
 #include "gd32f1x0_cmp.h"
 #include "gd32f1x0_crc.h"
 #include "gd32f1x0_dac.h"
-#include "gd32f1x0_dma.h"
 #include "gd32f1x0_exti.h"
 #include "gd32f1x0_fmc.h"
 #include "gd32f1x0_gpio.h"
@@ -34,6 +34,7 @@
 #include "gd32f1x0_timer.h"
 #include "gd32f1x0_tsi.h"
 #include "gd32f1x0_usart.h"
+#include "stm32f1xx_hal_uart.h"
 #include "gd32f1x0_wwdg.h"
 
 #endif /* __GD32F1X0_CONF_H */

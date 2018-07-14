@@ -9,7 +9,6 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "gd32f1x0_dma.h"
 #include "gd32f1x0_adc.h"
 #include "gd32f1x0_rcc.h"
 

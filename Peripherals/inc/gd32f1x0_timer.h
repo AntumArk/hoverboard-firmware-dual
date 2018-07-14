@@ -18,6 +18,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gd32f1x0.h"
+#include "stm32f1xx_hal_def.h"
+//#include "gd32f1x0_dma.h"
 
 /** @addtogroup GD32F1x0_Firmware
   * @{
@@ -78,7 +80,7 @@ typedef struct
   TIMER_TypeDef                 *Instance;     /*!< Register base address             */
   TIM_Base_InitTypeDef        Init;          /*!< TIM Time Base required parameters */
   HAL_TIM_ActiveChannel       Channel;       /*!< Active channel                    */
-  //DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array, this array is accessed by a @ref TIM_DMA_Handle_index */
+  //DMA_HandleTypeDef           *hdma[7U];     /*!< DMA Handlers array, this array is accessed by a @ref TIM_DMA_Handle_index */ // TO FIX : Strange bug, say DMA_HandleTypeDef not defined...
   //HAL_LockTypeDef             Lock;          /*!< Locking object                    */
   __IO HAL_TIM_StateTypeDef   State;         /*!< TIM operation state               */
 }TIM_HandleTypeDef;
@@ -703,6 +705,133 @@ typedef struct
   * @}
   */  
 
+/* Exported types ------------------------------------------------------------*/ 
+/** @defgroup TIMEx_Exported_Types TIMEx Exported Types
+  * @{
+  */
+
+
+/** 
+  * @brief  TIM Hall sensor Configuration Structure definition  
+  */
+
+typedef struct
+{
+
+  uint32_t IC1Polarity;            /*!< Specifies the active edge of the input signal.
+                                        This parameter can be a value of @ref TIM_Input_Capture_Polarity */
+
+  uint32_t IC1Prescaler;        /*!< Specifies the Input Capture Prescaler.
+                                     This parameter can be a value of @ref TIM_Input_Capture_Prescaler */
+
+  uint32_t IC1Filter;           /*!< Specifies the input capture filter.
+                                     This parameter can be a number between Min_Data = 0x0 and Max_Data = 0xF */  
+  uint32_t Commutation_Delay;  /*!< Specifies the pulse value to be loaded into the Capture Compare Register. 
+                                    This parameter can be a number between Min_Data = 0x0000 and Max_Data = 0xFFFF */
+} TIM_HallSensor_InitTypeDef;
+
+
+#if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
+    defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
+    defined (STM32F105xC) || defined (STM32F107xC)
+
+/** 
+  * @brief  TIM Break and Dead time configuration Structure definition  
+  */ 
+typedef struct
+{
+  uint32_t OffStateRunMode;       /*!< TIM off state in run mode
+                                     This parameter can be a value of @ref TIM_OSSR_Off_State_Selection_for_Run_mode_state */
+  uint32_t OffStateIDLEMode;      /*!< TIM off state in IDLE mode
+                                     This parameter can be a value of @ref TIM_OSSI_Off_State_Selection_for_Idle_mode_state */
+  uint32_t LockLevel;             /*!< TIM Lock level
+                                     This parameter can be a value of @ref TIM_Lock_level */                             
+  uint32_t DeadTime;              /*!< TIM dead Time 
+                                     This parameter can be a number between Min_Data = 0x00 and Max_Data = 0xFF */
+  uint32_t BreakState;            /*!< TIM Break State 
+                                     This parameter can be a value of @ref TIM_Break_Input_enable_disable */
+  uint32_t BreakPolarity;         /*!< TIM Break input polarity 
+                                     This parameter can be a value of @ref TIM_Break_Polarity */
+  uint32_t AutomaticOutput;       /*!< TIM Automatic Output Enable state 
+                                     This parameter can be a value of @ref TIM_AOE_Bit_Set_Reset */           
+} TIM_BreakDeadTimeConfigTypeDef;
+
+#endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
+       /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
+       /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
+
+/** 
+  * @brief  TIM Master configuration Structure definition  
+  */ 
+typedef struct {
+  uint32_t  MasterOutputTrigger;   /*!< Trigger output (TRGO) selection 
+                                      This parameter can be a value of @ref TIM_Master_Mode_Selection */ 
+  uint32_t  MasterSlaveMode;       /*!< Master/slave mode selection 
+                                      This parameter can be a value of @ref TIM_Master_Slave_Mode */
+}TIM_MasterConfigTypeDef;
+
+/**
+  * @}
+  */ 
+
+/* Exported constants --------------------------------------------------------*/
+#if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
+    defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
+    defined (STM32F105xC) || defined (STM32F107xC)
+/** @defgroup TIMEx_Exported_Constants TIMEx Exported Constants
+  * @{
+  */
+    
+/** @defgroup TIMEx_Clock_Filter TIMEx Clock Filter
+  * @{
+  */
+#define IS_TIM_DEADTIME(DEADTIME)      ((DEADTIME) <= 0xFFU)          /*!< BreakDead Time */
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */
+#endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
+       /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
+       /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
+
+/* Exported macro ------------------------------------------------------------*/
+/**
+  * @brief  Sets the TIM Output compare preload.
+  * @param  __HANDLE__: TIM handle.
+  * @param  __CHANNEL__: TIM Channels to be configured.
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIM_CHANNEL_3: TIM Channel 3 selected
+  *            @arg TIM_CHANNEL_4: TIM Channel 4 selected
+  * @retval None
+  */
+#define __HAL_TIM_ENABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
+        (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 |= TIM_CCMR1_OC1PE) :\
+         ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 |= TIM_CCMR1_OC2PE) :\
+         ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 |= TIM_CCMR2_OC3PE) :\
+         ((__HANDLE__)->Instance->CCMR2 |= TIM_CCMR2_OC4PE))
+
+/**
+  * @brief  Resets the TIM Output compare preload.
+  * @param  __HANDLE__: TIM handle.
+  * @param  __CHANNEL__: TIM Channels to be configured.
+  *          This parameter can be one of the following values:
+  *            @arg TIM_CHANNEL_1: TIM Channel 1 selected
+  *            @arg TIM_CHANNEL_2: TIM Channel 2 selected
+  *            @arg TIM_CHANNEL_3: TIM Channel 3 selected
+  *            @arg TIM_CHANNEL_4: TIM Channel 4 selected
+  * @retval None
+  */
+#define __HAL_TIM_DISABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
+        (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= (uint16_t)~TIM_CCMR1_OC1PE) :\
+         ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= (uint16_t)~TIM_CCMR1_OC2PE) :\
+         ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= (uint16_t)~TIM_CCMR2_OC3PE) :\
+         ((__HANDLE__)->Instance->CCMR2 &= (uint16_t)~TIM_CCMR2_OC4PE))
+  
 /** @defgroup TIMER_Exported_Functions
   * @{
   */

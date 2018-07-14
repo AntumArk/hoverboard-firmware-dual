@@ -35,9 +35,11 @@ BAT   PC2 CH12   L_RX PA3 CH03
 pb10 usart1 dma1 channel2/3
 */
 
+#include <stdint.h>
 #include "defines.h"
 #include "config.h"
-#include "gd32f1x0_timer.h"
+#include "gd32f1x0.h"
+#include "gd32f1x0_stm32_compat.h"
 
 //TIM_HandleTypeDef htim_right;
 TIM_HandleTypeDef htim_left;
@@ -141,7 +143,7 @@ void UART_Init() {
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   HAL_UART_Init(&huart1);
 
-  USART3->CR3 |= USART_CR3_DMAT;  // | USART_CR3_DMAR | USART_CR3_OVRDIS;
+  USART1->CR3 |= USART_CR3_DMAT;  // | USART_CR3_DMAR | USART_CR3_OVRDIS;
 
   GPIO_InitTypeDef GPIO_InitStruct;
   GPIO_InitStruct.Pin   = GPIO_PIN_10;
@@ -151,7 +153,7 @@ void UART_Init() {
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   DMA1_Channel4->CCR   = 0;
-  DMA1_Channel4->CPAR  = (uint32_t) & (USART3->DR);
+  DMA1_Channel4->CPAR  = (uint32_t) & (USART1->DR);
   DMA1_Channel4->CNDTR = 0;
   DMA1_Channel4->CCR   = DMA_CCR_MINC | DMA_CCR_DIR;
   DMA1->IFCR           = DMA_IFCR_CTCIF2 | DMA_IFCR_CHTIF2 | DMA_IFCR_CGIF2;

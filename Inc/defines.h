@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /*#ifndef uint16_t
 	#define uint16_t uint16
 #endif

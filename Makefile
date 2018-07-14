@@ -22,7 +22,11 @@ C_SOURCES =  \
 core_cm3.c \
 $(wildcard Peripherals/src/*.c) \
 $(wildcard CMSIS/*.c) \
-$(wildcard Src/*.c)
+Src/setup.c \
+Src/control.c \
+Src/main.c \
+Src/bldc.c \
+Src/comms.c 
 
 
 # ASM sources
@@ -73,10 +77,9 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--ISrc/ \
--IInc/ \
--IDrivers/CMSIS/ \
--IPeripherals/inc/
+-IInc \
+-IPeripherals/inc \
+-IDrivers/CMSIS
 
 
 # compile gcc flags
