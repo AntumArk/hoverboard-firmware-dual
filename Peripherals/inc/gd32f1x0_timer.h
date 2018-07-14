@@ -93,7 +93,7 @@ typedef struct
 
 typedef struct
 {
-    uint16_t TIMER_OCMode;                          /*!< Out mode, 
+    uint16_t OCMode;                          /*!< Out mode, 
                                                          a value of @ref TIMER_Output_Compare_and_PWM_modes */
 
     uint16_t TIMER_OutputState;                     /*!< Output Compare state , 
@@ -101,18 +101,18 @@ typedef struct
     uint16_t TIMER_OutputNState;                    /*!< Complementary Output Compare state , 
                                                          a value of @ref TIMER_Output_Compare_N_State,
                                                          valid only for TIMER1. */
-    uint32_t TIMER_Pulse;                           /*!< Pulse value to be loaded into the CHCCx. */
-    uint16_t TIMER_OCPolarity;                      /*!< Output polarity , 
+    uint32_t Pulse;                           /*!< Pulse value to be loaded into the CHCCx. */
+    uint16_t OCPolarity;                      /*!< Output polarity , 
                                                          a value of @ref TIMER_Output_Compare_Polarity */
-    uint16_t TIMER_OCNPolarity;                     /*!< Complementary output polarity , 
+    uint16_t OCNPolarity;                     /*!< Complementary output polarity , 
                                                          a value of @ref TIMER_Output_Compare_N_Polarity */
-    uint16_t TIMER_OCIdleState;                     /*!< TIM Output Compare pin state during Idle state ,
+    uint16_t OCIdleState;                     /*!< TIM Output Compare pin state during Idle state ,
                                                          a value of @ref TIMER_Output_Compare_Idle_State,
                                                          valid only for TIMER1. */
-    uint16_t TIMER_OCNIdleState;                    /*!< TIM Complementary Output Compare pin state during Idle state.
+    uint16_t OCNIdleState;                    /*!< TIM Complementary Output Compare pin state during Idle state.
                                                          a value of @ref TIMER_Output_Compare_N_Idle_State , 
                                                          valid only for TIMER1. */
-} TIMER_OCInitPara;
+} TIM_OC_InitTypeDef;
 
 /** 
   * @brief   Timer input capture init structure
@@ -729,12 +729,12 @@ void TIMER_BKDTStructInit( TIMER_BKDTInitPara* TIMER_BKDTInitParaStruct);
 void TIMER_CtrlPWMOutputs( TIMER_TypeDef* TIMERx , TypeState NewValue);
 
 /* Output Compare management **************************************************/
-void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIMER_OCInitPara* TIMER_OCInitParaStruct);
-void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIMER_OCInitPara* TIMER_OCInitParaStruct );
-void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIMER_OCInitPara* TIMER_OCInitParaStruct );
-void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIMER_OCInitPara* TIMER_OCInitParaStruct );
-void TIMER_OCStructInit( TIMER_OCInitPara* TIMER_OCInitParaStruct );
-void TIMER_OCxModeConfig( TIMER_TypeDef* TIMERx , uint16_t TIMER_Ch, uint16_t TIMER_OCMode );
+void TIMER_OC1_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct);
+void TIMER_OC2_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
+void TIMER_OC3_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
+void TIMER_OC4_Init( TIMER_TypeDef* TIMERx , TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
+void TIMER_OCStructInit( TIM_OC_InitTypeDef* TIM_OC_InitTypeDefStruct );
+void TIMER_OCxModeConfig( TIMER_TypeDef* TIMERx , uint16_t TIMER_Ch, uint16_t OCMode );
 void TIMER_Compare1Config( TIMER_TypeDef* TIMERx , uint32_t CompValue1 );
 void TIMER_Compare2Config( TIMER_TypeDef* TIMERx , uint32_t CompValue2 );
 void TIMER_Compare3Config( TIMER_TypeDef* TIMERx , uint32_t CompValue3 );
@@ -756,13 +756,13 @@ void TIMER_OC1_RefClear( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCClear );
 void TIMER_OC2_RefClear( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCClear );
 void TIMER_OC3_RefClear( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCClear );
 void TIMER_OC4_RefClear( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCClear );
-void TIMER_OC1_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCPolarity);
-void TIMER_OC1N_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCNPolarity);
-void TIMER_OC2_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCPolarity);
-void TIMER_OC2N_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCNPolarity);
-void TIMER_OC3_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCPolarity);
-void TIMER_OC3N_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCNPolarity);
-void TIMER_OC4_Polarity( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCPolarity);
+void TIMER_OC1_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCPolarity);
+void TIMER_OC1N_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCNPolarity);
+void TIMER_OC2_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCPolarity);
+void TIMER_OC2N_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCNPolarity);
+void TIMER_OC3_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCPolarity);
+void TIMER_OC3N_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCNPolarity);
+void TIMER_OC4_Polarity( TIMER_TypeDef* TIMERx , uint16_t OCPolarity);
 void TIMER_SelectOCRefClear( TIMER_TypeDef* TIMERx , uint16_t TIMER_OCRef_Clear );
 void TIMER_CCxCmd( TIMER_TypeDef* TIMERx , uint16_t TIMER_Ch, uint16_t TIMER_CCx );
 void TIMER_CCxNCmd( TIMER_TypeDef* TIMERx , uint16_t TIMER_Ch, uint16_t TIMER_CCxN );
