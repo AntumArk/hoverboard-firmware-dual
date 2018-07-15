@@ -79,9 +79,9 @@ void UART_Control_Init() {
 
 
   __HAL_RCC_DMA1_CLK_ENABLE();
-  /* USER CODE BEGIN USART2_MspInit 0 */
+  /* USER CODE BEGIN USART1_MspInit 0 */
    __HAL_RCC_GPIOA_CLK_ENABLE();
-  /* USER CODE END USART2_MspInit 0 */
+  /* USER CODE END USART1_MspInit 0 */
    /* Peripheral clock enable */
    __HAL_RCC_USART1_CLK_ENABLE();
 
@@ -140,7 +140,7 @@ void UART_Init() {
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   HAL_UART_Init(&huart1);
 
-  USART3->CR3 |= USART_CR3_DMAT;  // | USART_CR3_DMAR | USART_CR3_OVRDIS;
+  USART1->CR3 |= USART_CR3_DMAT;  // | USART_CR3_DMAR | USART_CR3_OVRDIS;
 
   GPIO_InitTypeDef GPIO_InitStruct;
   GPIO_InitStruct.Pin   = GPIO_PIN_10;
@@ -150,7 +150,7 @@ void UART_Init() {
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   DMA1_Channel4->CCR   = 0;
-  DMA1_Channel4->CPAR  = (uint32_t) & (USART3->DR);
+  DMA1_Channel4->CPAR  = (uint32_t) & (USART1->DR);
   DMA1_Channel4->CNDTR = 0;
   DMA1_Channel4->CCR   = DMA_CCR_MINC | DMA_CCR_DIR;
   DMA1->IFCR           = DMA_IFCR_CTCIF2 | DMA_IFCR_CHTIF2 | DMA_IFCR_CGIF2;
@@ -488,7 +488,7 @@ void MX_ADC1_Init(void) {
   hadc1.Init.ScanConvMode          = ADC_SCAN_ENABLE;
   hadc1.Init.ContinuousConvMode    = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConv      = ADC_EXTERNALTRIGCONV_T8_TRGO;
+  hadc1.Init.ExternalTrigConv      = ADC_EXTERNALTRIGCONV_T3_TRGO;
   hadc1.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion       = 5;
   HAL_ADC_Init(&hadc1);
