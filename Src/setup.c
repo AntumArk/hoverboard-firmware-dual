@@ -252,7 +252,7 @@ void MX_GPIO_Init(void) {
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull  = GPIO_NOPULL;
@@ -375,7 +375,7 @@ void MX_GPIO_Init(void) {
 
 void MX_TIM_Init(void) {
   __HAL_RCC_TIM1_CLK_ENABLE();
-  __HAL_RCC_TIM8_CLK_ENABLE();
+  //__HAL_RCC_TIM8_CLK_ENABLE();
 
   TIM_MasterConfigTypeDef sMasterConfig;
   TIM_OC_InitTypeDef sConfigOC;
@@ -495,7 +495,7 @@ void MX_ADC1_Init(void) {
   /**Enable or disable the remapping of ADC1_ETRGREG:
     * ADC1 External Event regular conversion is connected to TIM8 TRG0
     */
-  __HAL_AFIO_REMAP_ADC1_ETRGREG_ENABLE();
+  //__HAL_AFIO_REMAP_ADC1_ETRGREG_ENABLE();
 
   /**Configure the ADC multi-mode
     */
