@@ -39,9 +39,10 @@ Src/system_stm32f1xx.c \
 Src/setup.c \
 Src/control.c \
 Src/main.c \
+Src/pid.c \
 Src/bldc.c \
 Src/comms.c \
-Src/sensorcomms.c \
+Src/sensorcoms.c \
 Src/softwareserial.c \
 Src/protocol.c \
 Src/hallinterrupts.c \
