@@ -46,18 +46,35 @@
 // ############################### SERIAL DEBUG ###############################
 
 //#define DEBUG_SERIAL_USART3         // right sensor board cable, disable if I2C (nunchuck or lcd) is used!
+#define DEBUG_SERIAL_USART2         // left sensor board cable, disable if ADC or PPM control is used!
 //#define DEBUG_SERIAL_SENSOR         // send to USART3 sensor board, without framing, at the CONTROL_SENSOR_BAUD rate
-#define DEBUG_BAUD       115200     // UART baud rate
 //#define DEBUG_SERIAL_SERVOTERM
+#define DEBUG_BAUD       19200      // UART baud rate
 #define DEBUG_SERIAL_ASCII          // "1:345 2:1337 3:0 4:0 5:0 6:0 7:0 8:0\r\n"
+#define UART_SEND_METHOD_2          // Change beetwen 2 methods of sending data
+
+// ############################### SOFTWARE SERIAL ###############################
+
+//#define SOFTWARE_SERIAL
+//#define DEBUG_SOFTWARE_SERIAL
+// there should now be a free choice of serial GPIO pins
+#define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_3    // PB11/USART3_RX Pin30      PA3/USART2_RX/ADC123_IN3  Pin17
+#define SOFTWARE_SERIAL_RX_PORT GPIOA
+#define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_2    // PB10/USART3_TX Pin29      PA2/USART2_TX/ADC123_IN2  Pin16
+#define SOFTWARE_SERIAL_TX_PORT GPIOA
+#define SOFTWARE_SERIAL_BAUD 9600
+
+// ############################### SERIAL PROTOCOL ###############################
+#define INCLUDE_PROTOCOL
 
 // ############################### INPUT ###############################
 
 // ###### CONTROL VIA UART (serial) ######
-//#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
+#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
 #define CONTROL_BAUD     19200    // control via usart from eg an Arduino or raspberry
 // for Arduino, use void loop(void){ Serial.write((uint8_t *) &steer, sizeof(steer)); Serial.write((uint8_t *) &speed, sizeof(speed));delay(20); }
 
+// ###### CONTROL VIA SENSOR BOARD (serial) ######
 // CONTROL_SENSOR implements control from original sensor boards.
 // the baud rate is 52177 for GD32 baseed YST boards.
 //#define READ_SENSOR
@@ -93,22 +110,6 @@
 //#define WHEEL_SIZE_INCHES 8.5 - set to your wheelsize to override the default 6.5
 
 
-// ############################### SOFTWARE SERIAL ###############################
-//
-#define SOFTWARE_SERIAL
-#define DEBUG_SOFTWARE_SERIAL
-// there should now be a free choice of serial GPIO pins
-#define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_3    // PB11/USART3_RX Pin30      PA3/USART2_RX/ADC123_IN3  Pin17
-#define SOFTWARE_SERIAL_RX_PORT GPIOA
-#define SOFTWARE_SERIAL_TX_PIN GPIO_PIN_2    // PB10/USART3_TX Pin29      PA2/USART2_TX/ADC123_IN2  Pin16
-#define SOFTWARE_SERIAL_TX_PORT GPIOA
-#define SOFTWARE_SERIAL_BAUD 9600
-
-// ############################### SERIAL PROTOCOL ###############################
-#define INCLUDE_PROTOCOL
-
-
-
 // ############################### DRIVING BEHAVIOR ###############################
 
 // inputs:
@@ -142,6 +143,22 @@
 // #define STEER_COEFFICIENT   -0.2
 
 // ############################### VALIDATE SETTINGS ###############################
+
+#if defined DEBUG_SERIAL_USART2 || defined DEBUG_SERIAL_USART3
+  #define DEBUG_SERIAL_USART
+#endif
+
+#if (defined DEBUG_SERIAL_USART2 && defined DEBUG_SERIAL_USART3) || (defined DEBUG_SERIAL_USART && defined SOFTWARE_SERIAL)
+  #error 2 serial out methods not allowed at this time.
+#endif
+
+#if defined DEBUG_SOFTWARE_SERIAL && !defined SOFTWARE_SERIAL
+  #error SOFTWARE_SERIAL must be activated to use DEBUG_SOFTWARE_SERIAL
+#endif
+
+#if defined DEBUG_SERIAL_SENSOR && !defined READ_SENSOR
+  #error READ_SENSOR must be activated to use DEBUG_SERIAL_SENSOR
+#endif
 
 #if defined CONTROL_SERIAL_USART2 && defined CONTROL_ADC
   #error CONTROL_ADC and CONTROL_SERIAL_USART2 not allowed. it is on the same cable.

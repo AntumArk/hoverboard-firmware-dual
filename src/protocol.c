@@ -137,14 +137,21 @@ int speed_control = 0; // incicates protocol driven
 
 /////////////////////////////////////////////////////////////
 // specify where to send data out of with a function pointer.
-#ifdef SOFTWARE_SERIAL
+#if defined SOFTWARE_SERIAL
 int (*send_serial_data)( unsigned char *data, int len ) = softwareserial_Send;
 int (*send_serial_data_wait)( unsigned char *data, int len ) = softwareserial_Send_Wait;
+#elif defined DEBUG_SERIAL_USART2 || defined DEBUG_SERIAL_USART3
+// NOT TESTED
+#ifdef UART_SEND_METHOD_2
+int send_serial_data( unsigned char *data, int len ){ sendToUart(data); };
+int send_serial_data_wait( unsigned char *data, int len ){ sendToUart(data); };
+#else
+int send_serial_data( unsigned char *data, int len ){ consoleLog(data); };
+int send_serial_data_wait( unsigned char *data, int len ){ consoleLog(data); };
 #endif
 
-#ifdef DEBUG_SERIAL_USART3
-// need to implement a buffering function here.
-// current DMA method needs attention...
+#else
+// No serial
 int nosend( unsigned char *data, int len ){ return 0; };
 int (*send_serial_data)( unsigned char *data, int len ) = nosend;
 int (*send_serial_data_wait)( unsigned char *data, int len ) = nosend;

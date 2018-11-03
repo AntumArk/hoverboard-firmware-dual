@@ -35,7 +35,7 @@ void consoleScope() {
   if (!enablescope)
     return;
 
-  #if defined DEBUG_SERIAL_SERVOTERM && defined DEBUG_SERIAL_USART3
+  #if defined DEBUG_SERIAL_SERVOTERM && defined DEBUG_SERIAL_USART
     uart_buf[0] = 0xff;
     uart_buf[1] = CLAMP(ch_buf[0]+127, 0, 255);
     uart_buf[2] = CLAMP(ch_buf[1]+127, 0, 255);
@@ -55,7 +55,7 @@ void consoleScope() {
     }
   #endif
 
-  #if defined DEBUG_SERIAL_ASCII && defined DEBUG_SERIAL_USART3
+  #if defined DEBUG_SERIAL_ASCII && defined DEBUG_SERIAL_USART
     memset(uart_buf, 0, sizeof(uart_buf));
     sprintf(uart_buf, "1:%i 2:%i 3:%i 4:%i 5:%i 6:%i 7:%i 8:%i\r\n", ch_buf[0], ch_buf[1], ch_buf[2], ch_buf[3], ch_buf[4], ch_buf[5], ch_buf[6], ch_buf[7]);
 
@@ -98,3 +98,18 @@ void consoleLog(char *message)
     HAL_UART_Transmit_DMA(&huart2, (uint8_t *)message, strlen(message));
     #endif
 }
+
+#ifdef UART_SEND_METHOD_2
+void sendToUart(char *message)
+{
+    memset(uart_buf, 0, sizeof(uart_buf));
+    sprintf(uart_buf, "%i", message); // Can be optimised to uart_buf = message?
+
+    if(UART_DMA_CHANNEL->CNDTR == 0) {
+      UART_DMA_CHANNEL->CCR &= ~DMA_CCR_EN;
+      UART_DMA_CHANNEL->CNDTR = strlen(uart_buf);
+      UART_DMA_CHANNEL->CMAR  = (uint32_t)uart_buf;
+      UART_DMA_CHANNEL->CCR |= DMA_CCR_EN;
+    }
+}
+#endif
