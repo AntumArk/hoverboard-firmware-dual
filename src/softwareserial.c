@@ -32,12 +32,12 @@
 
 
 TIM_HandleTypeDef softwareserialtimer;
+#ifdef SEND_SOFTWARE_SERIAL
 TIM_HandleTypeDef softwareserialtimerTX;
+#endif
 
 volatile unsigned int timerval = 0;
 volatile unsigned int ssbits = 0;
-
-#define DOTX
 
 #define SOFTWARE_SERIAL_BUFFER_SIZE 256
 typedef struct tag_SOFTWARE_SERIAL_BUFFER {
@@ -55,7 +55,9 @@ typedef struct tag_SOFTWARE_SERIAL_BUFFER {
 } SOFTWARE_SERIAL_BUFFER;
 
 volatile SOFTWARE_SERIAL_BUFFER softwareserialRXbuffer;
+#ifdef SEND_SOFTWARE_SERIAL
 volatile SOFTWARE_SERIAL_BUFFER softwareserialTXbuffer;
+#endif
 
 void SoftwareSerialReadTimer(void){
   unsigned int time = softwareserialtimer.Instance->CNT;
@@ -64,10 +66,11 @@ void SoftwareSerialReadTimer(void){
 
 void SoftwareSerialInit(void){
   memset((void *)&softwareserialRXbuffer, 0, sizeof(softwareserialRXbuffer));
-  memset((void *)&softwareserialTXbuffer, 0, sizeof(softwareserialTXbuffer));
-
   softwareserialRXbuffer.bit = -1; // awaiting start bit
+  #ifdef SEND_SOFTWARE_SERIAL
+  memset((void *)&softwareserialTXbuffer, 0, sizeof(softwareserialTXbuffer));
   softwareserialTXbuffer.bit = -1; // awaiting start bit
+  #endif
   
   // setup our GPIO pin for rising and falling interrupts
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -92,7 +95,7 @@ void SoftwareSerialInit(void){
   HAL_TIM_Base_Init(&softwareserialtimer);
   HAL_TIM_Base_Start(&softwareserialtimer);
 
-#ifdef DOTX
+#ifdef SEND_SOFTWARE_SERIAL
 
   GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull  = GPIO_PULLUP;
@@ -173,6 +176,7 @@ void softwareserial_flushRX(){
 
 //////////////////////////////////////////////////////////
 // flush receive
+#ifdef SEND_SOFTWARE_SERIAL
 void softwareserial_flushTX(){
     __disable_irq();
     softwareserialTXbuffer.head = softwareserialTXbuffer.tail;
@@ -245,7 +249,7 @@ int softwareserial_Send_Wait(unsigned char *data, int len){
 
     return orglen;
 }
-
+#endif
 
 
 // interrupt on rising or falling edge of serial....
@@ -299,7 +303,7 @@ void softwareserialRXInterrupt(void){
 }
 
 
-#ifdef DOTX
+#ifdef SEND_SOFTWARE_SERIAL
 // transmit interrupt
 void TIM3_IRQHandler(void){
     short t = -1;

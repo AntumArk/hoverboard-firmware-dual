@@ -58,8 +58,9 @@
 
 // ############################### SOFTWARE SERIAL ###############################
 
-//#define SOFTWARE_SERIAL
+#define SOFTWARE_SERIAL
 //#define DEBUG_SOFTWARE_SERIAL
+//#define SEND_SOFTWARE_SERIAL
 // there should now be a free choice of serial GPIO pins
 #define SOFTWARE_SERIAL_RX_PIN GPIO_PIN_3    // PB11/USART3_RX Pin30      PA3/USART2_RX/ADC123_IN3  Pin17
 #define SOFTWARE_SERIAL_RX_PORT GPIOA
@@ -74,7 +75,7 @@
 // ############################### INPUT ###############################
 
 // ###### CONTROL VIA UART (serial) ######
-#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
+//#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
 #define CONTROL_BAUD     19200    // control via usart from eg an Arduino or raspberry
 // for Arduino, use void loop(void){ Serial.write((uint8_t *) &steer, sizeof(steer)); Serial.write((uint8_t *) &speed, sizeof(speed));delay(20); }
 
@@ -152,7 +153,7 @@
   #define DEBUG_SERIAL_USART
 #endif
 
-#if (defined DEBUG_SERIAL_USART2 && defined DEBUG_SERIAL_USART3) || (defined DEBUG_SERIAL_USART && defined SOFTWARE_SERIAL)
+#if (defined DEBUG_SERIAL_USART2 && defined DEBUG_SERIAL_USART3) || (defined DEBUG_SERIAL_USART && defined DEBUG_SOFTWARE_SERIAL)
   #error 2 serial out methods not allowed at this time.
 #endif
 
