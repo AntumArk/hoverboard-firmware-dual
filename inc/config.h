@@ -37,7 +37,10 @@
 #define TEMP_POWEROFF_ENABLE    0         // to poweroff or not to poweroff, 1 or 0, DO NOT ACTIVITE WITHOUT CALIBRATION!
 #define TEMP_POWEROFF           65        // overheat poweroff. (while not driving) [°C]
 
+//#define INACTIVITY_ENABLE
 #define INACTIVITY_TIMEOUT 8        // minutes of not driving until poweroff. it is not very precise.
+#define HEARTBEAT_ENABLE            // stop motors if no messages received, security for automatic control for example
+#define HEARTBEAT_TIMEOUT 3         // seconds of no messages received until motor stop. it is not very precise.
 
 // ############################### LCD DEBUG ###############################
 
@@ -66,6 +69,7 @@
 
 // ############################### SERIAL PROTOCOL ###############################
 #define INCLUDE_PROTOCOL
+#define DMA_RX_BUFFER_SIZE          1
 
 // ############################### INPUT ###############################
 

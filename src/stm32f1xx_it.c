@@ -37,6 +37,7 @@
 #include "config.h"
 #include "hallinterrupts.h"
 #include "softwareserial.h"
+#include "protocol.h"
 
 
 extern DMA_HandleTypeDef hdma_i2c2_rx;
@@ -45,6 +46,8 @@ extern I2C_HandleTypeDef hi2c2;
 
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
+
+extern uint8_t DMA_RX_Buffer[DMA_RX_BUFFER_SIZE];
 
 /* USER CODE BEGIN 0 */
 
@@ -427,7 +430,7 @@ void DMA1_Channel6_IRQHandler(void)
   /* USER CODE END DMA1_Channel4_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_usart2_rx);
   /* USER CODE BEGIN DMA1_Channel4_IRQn 1 */
-
+  protocol_byte(DMA_RX_Buffer[0]);
   /* USER CODE END DMA1_Channel4_IRQn 1 */
 }
 

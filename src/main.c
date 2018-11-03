@@ -52,14 +52,18 @@ int cmd1;  // normalized input values. -1000 to 1000
 int cmd2;
 int cmd3;
 
+#ifdef INCLUDE_PROTOCOL
+uint8_t DMA_RX_Buffer[DMA_RX_BUFFER_SIZE];
+#else
 typedef struct{
    int16_t steer;
    int16_t speed;
    //uint32_t crc;
 } Serialcommand;
+volatile Serialcommand command;
+#endif
 int scale[2] = {15, 15};
 
-volatile Serialcommand command;
 
 #ifdef READ_SENSOR
 SENSOR_DATA last_sensor_data[2];
@@ -247,7 +251,7 @@ int main(void) {
   MX_ADC1_Init();
   MX_ADC2_Init();
 
-  #if defined(DEBUG_SERIAL_USART2) || defined(DEBUG_SERIAL_USART3)
+  #if defined DEBUG_SERIAL_USART
     UART_Init();
   #endif
 
@@ -306,7 +310,11 @@ int main(void) {
 
   #ifdef CONTROL_SERIAL_USART2
     UART_Control_Init();
+    #ifdef INCLUDE_PROTOCOL
+    HAL_UART_Receive_DMA(&huart2, DMA_RX_Buffer, DMA_RX_BUFFER_SIZE);
+    #else
     HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, 4);
+    #endif
 
   #endif
 
@@ -348,7 +356,7 @@ int main(void) {
   while(1) {
     startup_counter++;
 
-    #ifdef INCLUDE_PROTOCOL
+    #if defined INCLUDE_PROTOCOL && defined SOFTWARE_SERIAL
       // service input serial into out protocol parser
       // note: modbus expects to see a call > every ms
       // BUT, we want to loop every 5.
@@ -396,10 +404,14 @@ int main(void) {
     #endif
 
     #ifdef CONTROL_SERIAL_USART2
-      cmd1 = CLAMP((int16_t)command.steer, -1000, 1000);
-      cmd2 = CLAMP((int16_t)command.speed, -1000, 1000);
+      #ifdef INCLUDE_PROTOCOL
+        // Nothing now
+      #else
+        cmd1 = CLAMP((int16_t)command.steer, -1000, 1000);
+        cmd2 = CLAMP((int16_t)command.speed, -1000, 1000);
 
-      timeout = 0;
+        timeout = 0;
+      #endif
     #endif
 
 
@@ -711,6 +723,7 @@ int main(void) {
 
 
     // ####### INACTIVITY TIMEOUT #######
+    #if defined INACTIVITY_ENABLE
     if (ABS(pwms[0]) > 50 || ABS(pwms[1]) > 50) {
       inactivity_timeout_counter = 0;
     } else {
@@ -767,6 +780,7 @@ int main(void) {
         poweroff();
       }
     }
+    #endif
   }
 }
 
