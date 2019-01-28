@@ -10,7 +10,7 @@
 #define SOFTWARE_SERIAL_A2_A3 4
 
 // thoery says this is the only thing you need to change....
-#define CONTROL_TYPE HOVERBOARD_WITH_SOFTWARE_SERIAL_B2_C9
+#define CONTROL_TYPE USART2_CONTROLLED
 //////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@
   // hoverboard sensor functionality is disabled
   // and control is via USART2
   #define SERIAL_USART2_IT
-  //#define DEBUG_SERIAL_ASCII
+  #define DEBUG_SERIAL_ASCII
 #endif
 
 
@@ -182,13 +182,13 @@
 #define SOFTWARE_SERIAL_BAUD 9600
 
 // ############################### SERIAL PROTOCOL ###############################
-#define NO_PROTOCOL 0
-#define INCLUDE_PROTOCOL1 1 // enables processing of input characters through 'protocol.c'
-#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
+#define NO_PROTOCOL 1
+#define INCLUDE_PROTOCOL1 0 // enables processing of input characters through 'protocol.c'
+//#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
 
-//#define INCLUDE_PROTOCOL NO_PROTOCOL
+#define INCLUDE_PROTOCOL NO_PROTOCOL
 //#define INCLUDE_PROTOCOL INCLUDE_PROTOCOL1
-#define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
+//#define INCLUDE_PROTOCOL INCLUDE_PROTOCOL2
 
 // ############################### DRIVING BEHAVIOR ###############################
 
