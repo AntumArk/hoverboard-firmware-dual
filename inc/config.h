@@ -49,7 +49,7 @@
   // hoverboard sensor functionality is disabled
   // and control is via USART2
   #define SERIAL_USART2_IT
-  #define DEBUG_SERIAL_ASCII
+//  #define DEBUG_SERIAL_ASCII
 #endif
 
 
@@ -114,7 +114,8 @@
 // ############################### INPUT ###############################
 
 // ###### CONTROL VIA UART (serial) ######
-//#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
+#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
+ #define CONTROL_BAUD 115200
                                       // control via usart from eg an Arduino or raspberry
 // for Arduino, use void loop(void){ Serial.write((uint8_t *) &steer, sizeof(steer)); Serial.write((uint8_t *) &speed, sizeof(speed));delay(20); }
 
@@ -182,8 +183,8 @@
 #define SOFTWARE_SERIAL_BAUD 9600
 
 // ############################### SERIAL PROTOCOL ###############################
-#define NO_PROTOCOL 1
-#define INCLUDE_PROTOCOL1 0 // enables processing of input characters through 'protocol.c'
+#define NO_PROTOCOL 0
+#define INCLUDE_PROTOCOL1 1 // enables processing of input characters through 'protocol.c'
 //#define INCLUDE_PROTOCOL2 2 // enables processing of input characters through 'machine_protocol.c'
 
 #define INCLUDE_PROTOCOL NO_PROTOCOL
