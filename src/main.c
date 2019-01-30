@@ -619,7 +619,7 @@ int main(void) {
       ADDITIONAL_CODE;
     #endif
       if (!enable){
-        pwms[0] = pwms[1] = 0;
+       // pwms[0] = pwms[1] = 0;
       }
 
     #ifdef INVERT_R_DIRECTION
@@ -798,6 +798,7 @@ int main(void) {
       }
     }
   }
+  
 }
 
 /** System Clock Configuration
