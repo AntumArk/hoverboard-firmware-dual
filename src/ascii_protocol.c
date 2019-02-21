@@ -157,7 +157,7 @@ static int enable_immediate = 0;
 void ascii_byte( unsigned char byte ){
     int skipchar = 0;
     // only if no characters buffered, process single keystorkes
-    if (enable_immediate && (ascii_posn == 0)){
+    if (1 && (ascii_posn == 0)){ //Ignored immediate
         // returns 1 if char should not be kept in command buffer
         skipchar = ascii_process_immediate(byte);
     }
@@ -188,15 +188,6 @@ void ascii_byte( unsigned char byte ){
 }
 
 
-enum Mode 
-{
-    MANUAL_MODE = 0,
-    AUTOMATIC_MODE = 1
-};
-static int mode = MANUAL_MODE;
-int packagePos = 0;
-static int speedValue = 0;
-static int steerValue = 0;
 /////////////////////////////////////////////
 // single byte commands at start of command 
 // - i.e. only after CR of LF and ascii buffer empty
@@ -206,48 +197,7 @@ int ascii_process_immediate(unsigned char byte){
 
     int dir = 1;
 
-    switch(byte)
-    {
-        case 'M':
-            packagePos = 1;
-            mode = MANUAL_MODE;
-            break;
-        case 'A':
-            packagePos = 0;
-            mode = AUTOMATIC_MODE;
-            SpeedData.wanted_speed_mm_per_sec[1] = 0;
-            SpeedData.wanted_speed_mm_per_sec[0] = 0;
-            return 1;
-    }
-
-    if (mode == MANUAL_MODE && packagePos > 0)
-    {
-        if (packagePos == 1)
-        {
-            speedValue = byte - MAX_VALUE / 2;
-            speedValue *= MAX_SPEED;
-            speedValue /= (MAX_VALUE / 2);
-            packagePos++;
-        }
-        else if (packagePos == 2)
-        {
-            steerValue = byte - MAX_VALUE / 2;
-            steerValue *= MAX_SPEED;
-            steerValue /= (MAX_VALUE / 2);
-            SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
-            SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
-            sprintf(
-                ascii_out, 
-                "speed now %d, steer now %d, speedL %ld, speedR %ld\r\n", 
-                speedValue, 
-                steerValue,
-                SpeedData.wanted_speed_mm_per_sec[0], 
-                SpeedData.wanted_speed_mm_per_sec[1]);
-            packagePos = 0;
-        }
-        
-        return 1;
-    }
+   
 
     switch(byte){
         // case 'S':

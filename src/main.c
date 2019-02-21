@@ -53,13 +53,25 @@ int cmd2;
 int cmd3;
 
 typedef struct{
-   int16_t steer;
-   int16_t speed;
+  uint8_t mode;
+   uint8_t steer;
+   uint8_t speed;
    //uint32_t crc;
 } Serialcommand;
 int scale[2] = {15, 15};
 
 volatile Serialcommand command;
+uint8_t buffer[3];
+   
+enum Mode 
+{
+    MANUAL_MODE = 0,
+    AUTOMATIC_MODE = 1
+};
+static int mode = MANUAL_MODE;
+int packagePos = 0;
+static int speedValue = 0;
+static int steerValue = 0;
 
 #ifdef READ_SENSOR
 SENSOR_DATA last_sensor_data[2];
@@ -335,7 +347,7 @@ int main(void) {
 
   #ifdef CONTROL_SERIAL_USART2
     UART_Control_Init();
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&command, 4);
+    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&buffer, 3);
 
   #endif
 
@@ -379,20 +391,20 @@ int main(void) {
   while(1) {
     startup_counter++;
 
-    #if (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL1) || (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
-      unsigned long start = HAL_GetTick();
-      while (HAL_GetTick() < start + DELAY_IN_MAIN_LOOP){
-        // note: serial_available & serial_getrx defined above depending upon serial
-        while ( serial_available() > 0 ) {
-            SERIAL_USART_IT_BUFFERTYPE inputc = serial_getrx();
-            protocol_byte( (unsigned char) inputc );
-        }
-        // very (too?) regular tick to protocol.
-        protocol_tick();
-      }
-    #else // if no bytes to read, just do a delay
-      HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
-    #endif
+    // #if (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL1) || (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
+    //   unsigned long start = HAL_GetTick();
+    //   while (HAL_GetTick() < start + DELAY_IN_MAIN_LOOP){
+    //     // note: serial_available & serial_getrx defined above depending upon serial
+    //     while ( serial_available() > 0 ) {
+    //       uint16_t buffer[3];
+        
+    //       buffer[0]=0;
+    //        buffer[1]=0;
+    //         buffer[2]=0;
+    //          buffer[0] = serial_getrx();
+         
+
+
 
     cmd1 = 0;
     cmd2 = 0;
@@ -426,8 +438,51 @@ int main(void) {
     #endif
 
     #ifdef CONTROL_SERIAL_USART2
-      cmd1 = CLAMP((int16_t)command.steer, -1000, 1000);
-      cmd2 = CLAMP((int16_t)command.speed, -1000, 1000);
+    
+    if (buffer[0]=='A'||buffer[0]=='M') {
+     command.mode=buffer[0];
+     command.speed=buffer[1];
+     command.steer=buffer[2];
+    }
+    if (buffer[1]=='A'||buffer[1]=='M') {
+      command.mode=buffer[1];
+     command.speed=buffer[2];
+     command.steer=buffer[0];
+    }
+    if (buffer[2]=='A'||buffer[2]=='M') {
+      command.mode=buffer[2];
+     command.speed=buffer[0];
+     command.steer=buffer[1];
+    }
+    
+      switch(command.mode)
+    {
+        case 'M':
+            mode = MANUAL_MODE;
+            break;
+        case 'A':
+            mode = AUTOMATIC_MODE;
+           cmd1 = 0;
+           cmd2 = 0;
+            break;
+    }
+
+    if (mode == MANUAL_MODE )
+    {
+            speedValue = command.speed - MAX_VALUE / 2;
+            speedValue *= MAX_SPEED;
+            speedValue /= (MAX_VALUE / 2);
+            steerValue = command.steer- MAX_VALUE / 2;
+            steerValue *= MAX_SPEED;
+            steerValue /= (MAX_VALUE / 2);
+           cmd1 = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+          cmd2 = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+         
+        }
+
+         
+        
+    
 
       timeout = 0;
     #endif
@@ -702,7 +757,7 @@ int main(void) {
       }
     } else {
       // ####### POWEROFF BY POWER-BUTTON #######
-      if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) && weakr == 0 && weakl == 0) {
+      if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) ) {
         enable = 0;
         while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
         poweroff();

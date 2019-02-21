@@ -1,6 +1,6 @@
 #pragma once
 
-#define SERIAL_USART_BUFFER_SIZE 1024 // TODO: implement send_wait routine..
+#define SERIAL_USART_BUFFER_SIZE 3 // TODO: implement send_wait routine..
 typedef struct tag_serial_usart_buffer {
     SERIAL_USART_IT_BUFFERTYPE buff[SERIAL_USART_BUFFER_SIZE];
     int head; 

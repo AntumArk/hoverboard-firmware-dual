@@ -10,7 +10,7 @@
 #define SOFTWARE_SERIAL_A2_A3 4
 
 // thoery says this is the only thing you need to change....
-#define CONTROL_TYPE USART3_CONTROLLED
+#define CONTROL_TYPE USART2_CONTROLLED
 //////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@
 
 // ############################### ENABLE INTERRUPT READING OF HALL SENSORS FOR POSITION ###############################
 #define HALL_INTERRUPTS
-//#define WHEEL_SIZE_INCHES 8.5 - set to your wheelsize to override the default 6.5
+#define WHEEL_SIZE_INCHES 8.5 //- set to your wheelsize to override the default 6.5
 
 
 // ############################### SOFTWARE SERIAL ###############################
@@ -202,8 +202,8 @@
 // - weakr and weakl: field weakening for extra boost at high speed (speedR > 700 and speedL > 700). 0 to ~400
 
 #define FILTER              0.1  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
-#define SPEED_COEFFICIENT   0.5  // higher value == stronger. 0.0 to ~2.0?
-#define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
+#define SPEED_COEFFICIENT   1  // higher value == stronger. 0.0 to ~2.0?
+#define STEER_COEFFICIENT   1  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
 #define MAX_VALUE           80
 #define MAX_SPEED           1000
 #define INVERT_R_DIRECTION

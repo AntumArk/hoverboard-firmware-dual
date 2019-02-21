@@ -62,7 +62,7 @@ void UART_Control_Init() {
   /* DMA1_Channel6_IRQn interrupt configuration */
   //HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 5, 6);
   //HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
-  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 5, 6);
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 4, 4);
   HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
   /* DMA1_Channel7_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 5, 7);
@@ -98,7 +98,7 @@ void UART_Control_Init() {
  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
  /* Peripheral DMA init*/
-
+//hdma_usart2_rx.Instance.Channel=
  hdma_usart2_rx.Instance = DMA1_Channel6;
  hdma_usart2_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
  hdma_usart2_rx.Init.PeriphInc = DMA_PINC_DISABLE;
@@ -106,7 +106,7 @@ void UART_Control_Init() {
  hdma_usart2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
  hdma_usart2_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
  hdma_usart2_rx.Init.Mode = DMA_CIRCULAR; //DMA_NORMAL;
- hdma_usart2_rx.Init.Priority = DMA_PRIORITY_LOW;
+ hdma_usart2_rx.Init.Priority = DMA_PRIORITY_MEDIUM;
  HAL_DMA_Init(&hdma_usart2_rx);
 
  __HAL_LINKDMA(&huart2,hdmarx,hdma_usart2_rx);
