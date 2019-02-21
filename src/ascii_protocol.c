@@ -188,6 +188,15 @@ void ascii_byte( unsigned char byte ){
 }
 
 
+enum Mode 
+{
+    MANUAL_MODE = 0,
+    AUTOMATIC_MODE = 1
+};
+static int mode = MANUAL_MODE;
+int packagePos = 0;
+static int speedValue = 0;
+static int steerValue = 0;
 /////////////////////////////////////////////
 // single byte commands at start of command 
 // - i.e. only after CR of LF and ascii buffer empty
@@ -196,57 +205,101 @@ int ascii_process_immediate(unsigned char byte){
     ascii_out[0] = 0;
 
     int dir = 1;
-    switch(byte){
-        case 'S':
-        case 's':
-            dir = -1;
-        case 'W':
-        case 'w':
-            processed = 1;
-            if (!enable) { speedB = 0; steerB = 0; }
-            enable = 1;
-            timeout = 0;
 
-            switch (control_type){
-                case CONTROL_TYPE_POSITION:
-                    PosnData.wanted_posn_mm[0] += dir * 100;
-                    PosnData.wanted_posn_mm[1] += dir * 100;
-                    sprintf(ascii_out, "wanted_posn now %ldmm %ldmm\r\n", PosnData.wanted_posn_mm[0], PosnData.wanted_posn_mm[1]);
-                    break;
-                case CONTROL_TYPE_SPEED:
-                case CONTROL_TYPE_PWM:
-                    speedB += 10*dir;
-                    SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speedB * SPEED_COEFFICIENT -  steerB * STEER_COEFFICIENT, -1000, 1000);
-                    SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speedB * SPEED_COEFFICIENT +  steerB * STEER_COEFFICIENT, -1000, 1000);
-                    sprintf(ascii_out, "speed now %d, steer now %d, speedL %ld, speedR %ld\r\n", speedB, steerB, SpeedData.wanted_speed_mm_per_sec[0], SpeedData.wanted_speed_mm_per_sec[1]);
-                    break;
-            }
+    switch(byte)
+    {
+        case 'M':
+            packagePos = 1;
+            mode = MANUAL_MODE;
             break;
-
         case 'A':
-        case 'a':
-            dir = -1;
-        case 'D':
-        case 'd':
-            processed = 1;
-            if (!enable) { speedB = 0; steerB = 0; }
-            enable = 1;
-            timeout = 0;
-            switch (control_type){
-                case CONTROL_TYPE_POSITION:
-                    PosnData.wanted_posn_mm[0] += dir * 100;
-                    PosnData.wanted_posn_mm[1] -= dir * 100;
-                    sprintf(ascii_out, "wanted_posn now %ldmm %ldmm\r\n", PosnData.wanted_posn_mm[0], PosnData.wanted_posn_mm[1]);
-                    break;
-                case CONTROL_TYPE_SPEED:
-                case CONTROL_TYPE_PWM:
-                    steerB += 10*dir;
-                    SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speedB * SPEED_COEFFICIENT -  steerB * STEER_COEFFICIENT, -1000, 1000);
-                    SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speedB * SPEED_COEFFICIENT +  steerB * STEER_COEFFICIENT, -1000, 1000);
-                    sprintf(ascii_out, "speed now %d, steer now %d, speedL %ld, speedR %ld\r\n", speedB, steerB, SpeedData.wanted_speed_mm_per_sec[0], SpeedData.wanted_speed_mm_per_sec[1]);
-                    break;
-            }
-            break;
+            packagePos = 0;
+            mode = AUTOMATIC_MODE;
+            SpeedData.wanted_speed_mm_per_sec[1] = 0;
+            SpeedData.wanted_speed_mm_per_sec[0] = 0;
+            return 1;
+    }
+
+    if (mode == MANUAL_MODE && packagePos > 0)
+    {
+        if (packagePos == 1)
+        {
+            speedValue = byte - MAX_VALUE / 2;
+            speedValue *= MAX_SPEED;
+            speedValue /= (MAX_VALUE / 2);
+            packagePos++;
+        }
+        else if (packagePos == 2)
+        {
+            steerValue = byte - MAX_VALUE / 2;
+            steerValue *= MAX_SPEED;
+            steerValue /= (MAX_VALUE / 2);
+            SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+            SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+            sprintf(
+                ascii_out, 
+                "speed now %d, steer now %d, speedL %ld, speedR %ld\r\n", 
+                speedValue, 
+                steerValue,
+                SpeedData.wanted_speed_mm_per_sec[0], 
+                SpeedData.wanted_speed_mm_per_sec[1]);
+            packagePos = 0;
+        }
+        
+        return 1;
+    }
+
+    switch(byte){
+        // case 'S':
+        // case 's':
+        //     dir = -1;
+        // case 'W':
+        // case 'w':
+        //     processed = 1;
+        //     if (!enable) { speedB = 0; steerB = 0; }
+        //     enable = 1;
+        //     timeout = 0;
+
+        //     switch (control_type){
+        //         case CONTROL_TYPE_POSITION:
+        //             PosnData.wanted_posn_mm[0] += dir * 100;
+        //             PosnData.wanted_posn_mm[1] += dir * 100;
+        //             sprintf(ascii_out, "wanted_posn now %ldmm %ldmm\r\n", PosnData.wanted_posn_mm[0], PosnData.wanted_posn_mm[1]);
+        //             break;
+        //         case CONTROL_TYPE_SPEED:
+        //         case CONTROL_TYPE_PWM:
+        //             speedB += 10*dir;
+        //             SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speedB * SPEED_COEFFICIENT -  steerB * STEER_COEFFICIENT, -1000, 1000);
+        //             SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speedB * SPEED_COEFFICIENT +  steerB * STEER_COEFFICIENT, -1000, 1000);
+        //             sprintf(ascii_out, "speed now %d, steer now %d, speedL %ld, speedR %ld\r\n", speedB, steerB, SpeedData.wanted_speed_mm_per_sec[0], SpeedData.wanted_speed_mm_per_sec[1]);
+        //             break;
+        //     }
+        //     break;
+
+        // case 'A':
+        // case 'a':
+        //     dir = -1;
+        // case 'D':
+        // case 'd':
+        //     processed = 1;
+        //     if (!enable) { speedB = 0; steerB = 0; }
+        //     enable = 1;
+        //     timeout = 0;
+        //     switch (control_type){
+        //         case CONTROL_TYPE_POSITION:
+        //             PosnData.wanted_posn_mm[0] += dir * 100;
+        //             PosnData.wanted_posn_mm[1] -= dir * 100;
+        //             sprintf(ascii_out, "wanted_posn now %ldmm %ldmm\r\n", PosnData.wanted_posn_mm[0], PosnData.wanted_posn_mm[1]);
+        //             break;
+        //         case CONTROL_TYPE_SPEED:
+        //         case CONTROL_TYPE_PWM:
+        //             steerB += 10*dir;
+        //             SpeedData.wanted_speed_mm_per_sec[1] = CLAMP(speedB * SPEED_COEFFICIENT -  steerB * STEER_COEFFICIENT, -1000, 1000);
+        //             SpeedData.wanted_speed_mm_per_sec[0] = CLAMP(speedB * SPEED_COEFFICIENT +  steerB * STEER_COEFFICIENT, -1000, 1000);
+        //             sprintf(ascii_out, "speed now %d, steer now %d, speedL %ld, speedR %ld\r\n", speedB, steerB, SpeedData.wanted_speed_mm_per_sec[0], SpeedData.wanted_speed_mm_per_sec[1]);
+        //             break;
+        //     }
+        //     break;
 
         case 'X':
         case 'x':

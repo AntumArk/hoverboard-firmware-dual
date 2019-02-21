@@ -10,7 +10,7 @@
 #define SOFTWARE_SERIAL_A2_A3 4
 
 // thoery says this is the only thing you need to change....
-#define CONTROL_TYPE USART2_CONTROLLED
+#define CONTROL_TYPE USART3_CONTROLLED
 //////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////
@@ -204,6 +204,8 @@
 #define FILTER              0.1  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
 #define SPEED_COEFFICIENT   0.5  // higher value == stronger. 0.0 to ~2.0?
 #define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
+#define MAX_VALUE           80
+#define MAX_SPEED           1000
 #define INVERT_R_DIRECTION
 #define INVERT_L_DIRECTION
 #define BEEPS_BACKWARD 0    // 0 or 1
