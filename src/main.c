@@ -475,8 +475,10 @@ int main(void) {
             steerValue = command.steer- MAX_VALUE / 2;
             steerValue *= MAX_SPEED;
             steerValue /= (MAX_VALUE / 2);
-           cmd1 = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
-          cmd2 = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+          //  cmd1 = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+          // cmd2 = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+           cmd1 = speedValue;
+          cmd2 = steerValue;
          
         }
 
