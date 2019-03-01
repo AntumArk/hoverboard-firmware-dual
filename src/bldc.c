@@ -302,7 +302,7 @@ void DMA1_Channel1_IRQHandler() {
   }
 
   //update PWM channels based on position
-  if (1){
+  if (0){
     blockPWMSin(pwml, posl, fraction[0], &ul, &vl, &wl);
     blockPWMSin(pwmr, posr, fraction[1], &ur, &vr, &wr);
   } else {

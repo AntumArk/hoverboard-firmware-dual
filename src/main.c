@@ -73,12 +73,6 @@ int packagePos = 0;
 static int speedValue = 0;
 static int steerValue = 0;
 
-#ifdef READ_SENSOR
-SENSOR_DATA last_sensor_data[2];
-int sensor_control = 0;
-int sensor_stabilise = 0;
-
-#endif
 int disablepoweroff = 0;
 int powerofftimer = 0;
 
@@ -107,12 +101,6 @@ extern float batteryVoltage; // global variable for battery voltage
 
 uint32_t inactivity_timeout_counter;
 uint32_t debug_counter = 0;
-
-extern uint8_t nunchuck_data[6];
-#ifdef CONTROL_PPM
-extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
-#endif
-
 int milli_vel_error_sum = 0;
 
 ///////////////////////////////////////////////////////////////
@@ -162,92 +150,6 @@ int dirs[2] = {-1, 1};
 int dspeeds[2] = {0,0};
 
 
-
-/////////////////////////////////////////
-// variables stored in flash
-// from flashcontent.h
-FLASH_CONTENT FlashContent;
-const FLASH_CONTENT FlashDefaults = FLASH_DEFAULTS;
-
-
-typedef struct tag_PID_FLOATS{
-    float in;
-    float set;
-    float out;
-
-    int count; // - used in averaging speed between pid loops
-} PID_FLOATS;
-
-// setup pid control for left and right speed.
-pid_controller  PositionPid[2];
-// temp floats
-PID_FLOATS PositionPidFloats[2] = {
-  { 0, 0, 0,   0 },
-  { 0, 0, 0,   0 }
-};
-pid_controller  SpeedPid[2];
-// temp floats
-PID_FLOATS SpeedPidFloats[2] = {
-  { 0, 0, 0,   0 },
-  { 0, 0, 0,   0 }
-};
-
-void init_PID_control(){
-  memset(&PositionPid, 0, sizeof(PositionPid));
-  memset(&SpeedPid, 0, sizeof(SpeedPid));
-  for (int i = 0; i < 2; i++){
-    PositionPidFloats[i].in = 0;
-    PositionPidFloats[i].set = 0;
-    pid_create(&PositionPid[i], &PositionPidFloats[i].in, &PositionPidFloats[i].out, &PositionPidFloats[i].set, 
-      (float)FlashContent.PositionKpx100/100.0,
-      (float)FlashContent.PositionKix100/100.0,
-      (float)FlashContent.PositionKdx100/100.0);
-
-    // maximum pwm outputs for positional control; limits speed
-  	pid_limits(&PositionPid[i], -FlashContent.PositionPWMLimit, FlashContent.PositionPWMLimit);
-  	pid_auto(&PositionPid[i]);
-    SpeedPidFloats[i].in = 0;
-    SpeedPidFloats[i].set = 0;
-    pid_create(&SpeedPid[i], &SpeedPidFloats[i].in, &SpeedPidFloats[i].out, &SpeedPidFloats[i].set, 
-      (float)FlashContent.SpeedKpx100/100.0,
-      (float)FlashContent.SpeedKix100/100.0,
-      (float)FlashContent.SpeedKdx100/100.0);
-
-    // maximum increment to pwm outputs for speed control; limits changes in speed (accelleration)
-  	pid_limits(&SpeedPid[i], -FlashContent.SpeedPWMIncrementLimit, FlashContent.SpeedPWMIncrementLimit);
-  	pid_auto(&SpeedPid[i]);
-  }
-}
-
-void change_PID_constants(){
-  for (int i = 0; i < 2; i++){
-    pid_tune(&PositionPid[i], 
-      (float)FlashContent.PositionKpx100/100.0,
-      (float)FlashContent.PositionKix100/100.0,
-      (float)FlashContent.PositionKdx100/100.0);
-  	pid_limits(&PositionPid[i], -FlashContent.PositionPWMLimit, FlashContent.PositionPWMLimit);
-
-    pid_tune(&SpeedPid[i], 
-      (float)FlashContent.SpeedKpx100/100.0,
-      (float)FlashContent.SpeedKix100/100.0,
-      (float)FlashContent.SpeedKdx100/100.0);
-  	pid_limits(&SpeedPid[i], -FlashContent.SpeedPWMIncrementLimit, FlashContent.SpeedPWMIncrementLimit);
-  }
-}
-
-void init_flash_content(){
-  FLASH_CONTENT FlashRead;
-  int len = readFlash( (unsigned char *)&FlashRead, sizeof(FlashRead) );
-
-  if ((len != sizeof(FlashRead)) || (FlashRead.magic != CURRENT_MAGIC)){
-    memcpy(&FlashRead, &FlashDefaults, sizeof(FlashRead));
-    writeFlash( (unsigned char *)&FlashRead, sizeof(FlashRead) );
-    consoleLog("Flash initiailised\r\n");
-  }
-  memcpy(&FlashContent, &FlashRead, sizeof(FlashContent));
-}
-
-
 int main(void) {
   char tmp[200];
   HAL_Init();
@@ -287,16 +189,12 @@ int main(void) {
 
 
   memset((void*)&electrical_measurements, 0, sizeof(electrical_measurements));
-
+//Possibly pin to keep board on
   HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);
 
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc2);
 
-  #ifdef READ_SENSOR
-  // initialise to 9 bit interrupt driven comms on USART 2 & 3
-  sensor_init();
-  #endif
   #ifdef SERIAL_USART2_IT
   USART2_IT_init();
   #endif
@@ -304,73 +202,24 @@ int main(void) {
   USART3_IT_init();
   #endif
 
-
-  init_flash_content();
-
-  init_PID_control();
-
   for (int i = 8; i >= 0; i--) {
     buzzerFreq = i;
     HAL_Delay(100);
   }
   buzzerFreq = 0;
-
+  //Turns on board LED
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
 
-  //int lastspeeds[2] = {0, 0};
-
-  #ifdef READ_SENSOR
-  // things we use in main loop for sensor control
-  consoleLog("power on\n");
-  int OnBoard = 0;
-  int Center[2] = {0, 0};
-  int Clamp[2] =  {600, 600};
-  
-  #endif
   #ifdef HALL_INTERRUPTS
     // enables interrupt reading of hall sensors for dead reconing wheel position.
     HallInterruptinit();
   #endif
 
-  #ifdef SOFTWARE_SERIAL
-    SoftwareSerialInit();
-  #endif
-
-  #ifdef CONTROL_PPM
-    PPM_Init();
-  #endif
-
-  #ifdef CONTROL_NUNCHUCK
-    I2C_Init();
-    Nunchuck_Init();
-  #endif
 
   #ifdef CONTROL_SERIAL_USART2
     UART_Control_Init();
     HAL_UART_Receive_DMA(&huart2, (uint8_t *)&buffer, 3);
 
-  #endif
-
-  #ifdef DEBUG_I2C_LCD
-    I2C_Init();
-    HAL_Delay(50);
-    lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
-      lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
-      lcd.pcf8574.i2c = hi2c2;
-      lcd.NUMBER_OF_LINES = NUMBER_OF_LINES_2;
-      lcd.type = TYPE0;
-
-      if(LCD_Init(&lcd)!=LCD_OK){
-          // error occured
-          //TODO while(1);
-      }
-
-    LCD_ClearDisplay(&lcd);
-    HAL_Delay(5);
-    LCD_SetLocation(&lcd, 0, 0);
-    LCD_WriteString(&lcd, "Hover V2.0");
-    LCD_SetLocation(&lcd, 0, 1);
-    LCD_WriteString(&lcd, "Initializing...");
   #endif
 
   float board_temp_adc_filtered = (float)adc_buffer.temp;
@@ -383,60 +232,16 @@ int main(void) {
   
   unsigned int startup_counter = 0;
 
-  //#ifdef INCLUDE_PROTOCOL // Required in protocol 2?
-  int last_control_type = CONTROL_TYPE_NONE;
-  //#endif
-
 
   while(1) {
-    startup_counter++;
-
-    // #if (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL1) || (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
-    //   unsigned long start = HAL_GetTick();
-    //   while (HAL_GetTick() < start + DELAY_IN_MAIN_LOOP){
-    //     // note: serial_available & serial_getrx defined above depending upon serial
-    //     while ( serial_available() > 0 ) {
-    //       uint16_t buffer[3];
-        
-    //       buffer[0]=0;
-    //        buffer[1]=0;
-    //         buffer[2]=0;
-    //          buffer[0] = serial_getrx();
-         
-
+    //startup_counter++;
 
 
     cmd1 = 0;
     cmd2 = 0;
 
-    #ifdef CONTROL_NUNCHUCK
-      Nunchuck_Read();
-      cmd1 = CLAMP((nunchuck_data[0] - 127) * 8, -1000, 1000); // x - axis. Nunchuck joystick readings range 30 - 230
-      cmd2 = CLAMP((nunchuck_data[1] - 128) * 8, -1000, 1000); // y - axis
 
-      button1 = (uint8_t)nunchuck_data[5] & 1;
-      button2 = (uint8_t)(nunchuck_data[5] >> 1) & 1;
-    #endif
-
-    #ifdef CONTROL_PPM
-      cmd1 = CLAMP((ppm_captured_value[0] - 500) * 2, -1000, 1000);
-      cmd2 = CLAMP((ppm_captured_value[1] - 500) * 2, -1000, 1000);
-      button1 = ppm_captured_value[5] > 500;
-      float scale = ppm_captured_value[2] / 1000.0f;
-    #endif
-
-    #ifdef CONTROL_ADC
-      // ADC values range: 0-4095, see ADC-calibration in config.h
-      cmd1 = CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX) / (ADC1_MAX / 1000.0f);  // ADC1
-      cmd2 = CLAMP(adc_buffer.l_rx2 - ADC2_MIN, 0, ADC2_MAX) / (ADC2_MAX / 1000.0f);  // ADC2
-
-      // use ADCs as button inputs:
-      button1 = (uint8_t)(adc_buffer.l_tx2 > 2000);  // ADC1
-      button2 = (uint8_t)(adc_buffer.l_rx2 > 2000);  // ADC2
-
-      timeout = 0;
-    #endif
-
+    //Control protocol.
     #ifdef CONTROL_SERIAL_USART2
     
     if (buffer[0]=='A'||buffer[0]=='M') {
@@ -489,178 +294,6 @@ int main(void) {
       timeout = 0;
     #endif
 
-
-
-    #if defined(INCLUDE_PROTOCOL)||defined(READ_SENSOR)
-      if (!power_button_held){
-    #endif
-    #ifdef READ_SENSOR
-        // read the last sensor message in the buffer
-        sensor_read_data();
-
-        // tapp one or other side twice in 2s, with at least 1/4s between to
-        // enable hoverboard mode. 
-        if (CONTROL_TYPE_NONE == control_type){
-          if (sensor_data[0].doubletap || sensor_data[1].doubletap){
-            if (FlashContent.HoverboardEnable){
-              sensor_control = 1;
-            }
-            consoleLog("double tap -> hoverboard mode\r\n");
-            sensor_data[0].doubletap = 0;
-            sensor_data[1].doubletap = 0;
-          }
-        }
-
-        if (electrical_measurements.charging){
-          sensor_set_flash(0, 3);
-        } else {
-          sensor_set_flash(0, 0);
-        }
-
-        int rollhigh = 0;
-        for (int i = 0; i < 2; i++){
-          if  (sensor_data[i].sensor_ok){
-            sensor_set_colour(i, SENSOR_COLOUR_GREEN);
-            scale[i] = 3;
-          } else {
-            sensor_set_colour(i, SENSOR_COLOUR_RED);
-            scale[i] = 3;
-          }
-
-          if  (ABS(sensor_data[i].Roll) > 2000){
-            rollhigh = 1;
-          }
-          if  (ABS(sensor_data[i].Angle) > 9000){
-            rollhigh = 1;
-          }
-        }
-
-
-        // if roll is a large angle (>20 degrees)
-        // then disable
-    #ifdef CONTROL_SENSOR
-        if (sensor_control && FlashContent.HoverboardEnable){
-          if (rollhigh){
-            enable = 0;
-          } else {
-            if ((sensor_data[0].sensor_ok || sensor_data[1].sensor_ok) && !electrical_measurements.charging){
-              if (!OnBoard){
-                Center[0] = sensor_data[0].Angle;
-                Center[1] = sensor_data[1].Angle;
-                OnBoard = 1;
-              }
-
-              for (int i = 0; i < 2; i++){
-                pwms[i] = CLAMP(dirs[i]*(sensor_data[i].Angle - Center[i])/3+dspeeds[i], -Clamp[i], Clamp[i]);
-                if (sensor_data[i].sensor_ok){
-                  sensor_set_colour(i, SENSOR_COLOUR_YELLOW);
-                } else {
-                  sensor_set_colour(i, SENSOR_COLOUR_GREEN);
-                }
-              }
-              timeout = 0;
-              enable = 1;
-              inactivity_timeout_counter = 0;
-            } else {
-              OnBoard = 0;
-              for (int i = 0; i < 2; i++){
-                pwms[i] = CLAMP(dirs[i]*(sensor_data[i].Angle)/scale[i]+dspeeds[i], -80, 80);
-              }
-              timeout = 0;
-              enable = 1;
-            }
-          }
-        } 
-    #endif // end if control_sensor
-    
-    #endif // READ_SENSOR
-    #if defined(INCLUDE_PROTOCOL)||defined(READ_SENSOR)
-    #ifdef READ_SENSOR
-        if (!sensor_control || !FlashContent.HoverboardEnable){
-    #else
-        if (!FlashContent.HoverboardEnable){
-    #endif //READ_SENSOR
-
-          if ((last_control_type != control_type) || (!enable)){
-            // nasty things happen if it's not re-initialised
-            init_PID_control();
-            last_control_type = control_type;
-          }
-
-          switch (control_type){
-            case CONTROL_TYPE_POSITION:
-              for (int i = 0; i < 2; i++){
-                if (pid_need_compute(&PositionPid[i])) {
-                  // Read process feedback
-                  PositionPidFloats[i].set = PosnData.wanted_posn_mm[i];
-                  PositionPidFloats[i].in = HallData[i].HallPosn_mm;
-                  // Compute new PID output value
-                  pid_compute(&PositionPid[i]);
-                  //Change actuator value
-                  int pwm = PositionPidFloats[i].out;
-                  pwms[i] = pwm;
-                  if (i == 0){
-                    sprintf(tmp, "%d:%d\r\n", i, pwm);
-                    consoleLog(tmp);
-                  }
-                }
-              }
-              break;
-            case CONTROL_TYPE_SPEED:
-              for (int i = 0; i < 2; i++){
-                // average speed over all the loops until pid_need_compute() returns !=0
-                SpeedPidFloats[i].in += HallData[i].HallSpeed_mm_per_s;
-                SpeedPidFloats[i].count++;
-                if (!enable){ // don't want anything building up
-                  SpeedPidFloats[i].in = 0;
-                  SpeedPidFloats[i].count = 1;
-                }
-                if (pid_need_compute(&SpeedPid[i])) {
-                  // Read process feedback
-                  int belowmin = 0;
-                  // won't work below about 45
-                  if (ABS(SpeedData.wanted_speed_mm_per_sec[i]) < SpeedData.speed_minimum_speed){
-                    SpeedPidFloats[i].set = 0;
-                    belowmin = 1;
-                  } else {  
-                    SpeedPidFloats[i].set = SpeedData.wanted_speed_mm_per_sec[i];
-                  }
-                  SpeedPidFloats[i].in = SpeedPidFloats[i].in/(float)SpeedPidFloats[i].count;
-                  SpeedPidFloats[i].count = 0;
-                  // Compute new PID output value
-                  pid_compute(&SpeedPid[i]);
-                  //Change actuator value
-                  int pwm = SpeedPidFloats[i].out;
-                  if (belowmin){
-                    pwms[i] = 0;
-                  } else {
-                    pwms[i] = 
-                      CLAMP(pwms[i] + pwm, -SpeedData.speed_max_power, SpeedData.speed_max_power);
-                  }
-                  if (i == 0){
-                    sprintf(tmp, "%d:%d(%d) S:%d H:%d\r\n", i, pwms[i], pwm, (int)SpeedPidFloats[i].set, (int)SpeedPidFloats[i].in);
-                    consoleLog(tmp);
-                  }
-                }
-              }
-              break;
-            case CONTROL_TYPE_PWM:
-              for (int i = 0; i < 2; i++){
-                pwms[i] = SpeedData.wanted_speed_mm_per_sec[i];
-              }
-              break;
-          }
-        }
-      }
-
-    #ifdef READ_SENSOR
-      // send twice to make sure each side gets it.
-      // if we sent diagnositc data, it seems to need this.
-      sensor_send_lights();
-    #endif
-    #else
-
-
       // ####### LOW-PASS FILTER #######
       steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
       speed = speed * (1.0 - FILTER) + cmd2 * FILTER;
@@ -670,15 +303,9 @@ int main(void) {
       pwms[0] = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
       pwms[1] = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
 
-    #endif
-
     #ifdef ADDITIONAL_CODE
       ADDITIONAL_CODE;
     #endif
-      if (!enable){
-       // pwms[0] = pwms[1] = 0;
-      }
-
     #ifdef INVERT_R_DIRECTION
       pwmr = pwms[1];
     #else
@@ -705,15 +332,7 @@ int main(void) {
       electrical_measurements.charging = !(CHARGER_PORT->IDR & CHARGER_PIN);
 
       // ####### DEBUG SERIAL OUT #######
-      #ifdef CONTROL_ADC
-        setScopeChannel(0, (int)adc_buffer.l_tx2);  // 1: ADC1
-        setScopeChannel(1, (int)adc_buffer.l_rx2);  // 2: ADC2
-      #endif
-
-      #ifdef CONTROL_SENSOR
-        setScopeChannel(0, (int)sensor_data[0].Angle);  // 1: ADC1
-        setScopeChannel(1, -(int)sensor_data[1].Angle);  // 2: ADC2
-      #endif
+  
 
       setScopeChannel(2, (int)pwms[1]);  // 3: output speed: 0-1000
       setScopeChannel(3, (int)pwms[0]);  // 4: output speed: 0-1000
@@ -728,43 +347,14 @@ int main(void) {
 
 
     if (power_button_held){
-      // highlight that the button has been helpd for >5s
-      if (startup_counter > (5000/DELAY_IN_MAIN_LOOP)){
-        #if defined CONTROL_SENSOR && defined FLASH_STORAGE
-          sensor_set_flash(0, 2);
-          sensor_set_flash(1, 2);
-        #endif
-      }
-
-      if (!HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
-        // if it was held for > 5 seconds
-        if (startup_counter > (5000/DELAY_IN_MAIN_LOOP)){
-#ifdef EXAMPLE_FLASH_ONLY
-          #if defined CONTROL_SENSOR && defined FLASH_STORAGE
-            calibrationdata[0] = sensor_data[0].Angle;
-            calibrationdata[1] = sensor_data[1].Angle;
-            calibrationread = 1;
-
-            char tmp[40];
-            sprintf(tmp, "\r\n*** Write Flash Calibration data");
-            consoleLog(tmp);
-            writeFlash((unsigned char *) calibrationdata, sizeof(calibrationdata));
-            sensor_set_flash(0, 0);
-            sensor_set_flash(1, 0);
-          #endif
-#endif
-        }
-
-        power_button_held = 0;
-      }
-    } else {
+    
       // ####### POWEROFF BY POWER-BUTTON #######
       if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) ) {
         enable = 0;
         while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
         poweroff();
       }
-    }
+    
 
     // if we plug in the charger, keep us alive
     // also if we have deliberately turned off poweroff over serial

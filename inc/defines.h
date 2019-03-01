@@ -112,10 +112,10 @@
 #define SWITCH_PIN GPIO_PIN_1
 #define SWITCH_PORT GPIOA
 
-#define OFF_PIN GPIO_PIN_5
+#define OFF_PIN GPIO_PIN_5 //Connects to R5, Turns on Latch circuit to power on MCU
 #define OFF_PORT GPIOA
 
-#define BUTTON_PIN GPIO_PIN_1
+#define BUTTON_PIN GPIO_PIN_1 //Supplies MCU
 #define BUTTON_PORT GPIOA
 
 #define CHARGER_PIN GPIO_PIN_12
