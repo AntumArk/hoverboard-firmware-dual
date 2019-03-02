@@ -68,7 +68,7 @@ enum Mode
     MANUAL_MODE = 0,
     AUTOMATIC_MODE = 1
 };
-static int mode = MANUAL_MODE;
+static int mode = AUTOMATIC_MODE;
 int packagePos = 0;
 static int speedValue = 0;
 static int steerValue = 0;
@@ -445,8 +445,8 @@ int main(void) {
       }
     }
   }
-  
-}
+  HAL_Delay(DELAY_IN_MAIN_LOOP);
+}}
 
 /** System Clock Configuration
 */
