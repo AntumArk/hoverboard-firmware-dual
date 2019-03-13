@@ -130,7 +130,7 @@
 #define MAX_SPEED           700
 #define INVERT_R_DIRECTION
 //#define INVERT_L_DIRECTION
-#define BEEPS_BACKWARD 1    // 0 or 1
+#define BEEPS_BACKWARD 0   // 0 or 1
 
 
 #if (INCLUDE_PROTOCOL == NO_PROTOCOL)

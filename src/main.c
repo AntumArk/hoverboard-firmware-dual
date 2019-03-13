@@ -105,21 +105,21 @@ int milli_vel_error_sum = 0;
 
 ///////////////////////////////////////////////////////////////
 // define where to get serial data for protocol.c
-#if (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL1) || (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
-  #ifdef SOFTWARE_SERIAL
-    int (*serial_available)() = softwareserial_available;
-    SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return softwareserial_getrx();} 
-  #elif defined(SERIAL_USART2_IT) && !defined(READ_SENSOR) // READ_SENSOR uses SERIAL_USART2_IT
-    int serial_available() { return serial_usart_buffer_count(&usart2_it_RXbuffer); }
-    SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return serial_usart_buffer_pop(&usart2_it_RXbuffer);} 
-  #elif defined(SERIAL_USART3_IT) && !defined(READ_SENSOR) // READ_SENSOR uses SERIAL_USART3_IT
-    int serial_available() { return serial_usart_buffer_count(&usart3_it_RXbuffer); }
-    SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return serial_usart_buffer_pop(&usart3_it_RXbuffer);} 
-  #else
-    int serial_available() { return 0; }
-    SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return 0; } 
-  #endif 
-#endif
+// #if (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL1) || (INCLUDE_PROTOCOL == INCLUDE_PROTOCOL2)
+//   #ifdef SOFTWARE_SERIAL
+//     int (*serial_available)() = softwareserial_available;
+//     SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return softwareserial_getrx();} 
+//   #elif defined(SERIAL_USART2_IT) && !defined(READ_SENSOR) // READ_SENSOR uses SERIAL_USART2_IT
+//     int serial_available() { return serial_usart_buffer_count(&usart2_it_RXbuffer); }
+//     SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return serial_usart_buffer_pop(&usart2_it_RXbuffer);} 
+//   #elif defined(SERIAL_USART3_IT) && !defined(READ_SENSOR) // READ_SENSOR uses SERIAL_USART3_IT
+//     int serial_available() { return serial_usart_buffer_count(&usart3_it_RXbuffer); }
+//     SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return serial_usart_buffer_pop(&usart3_it_RXbuffer);} 
+//   #else
+//     int serial_available() { return 0; }
+//     SERIAL_USART_IT_BUFFERTYPE serial_getrx() { return 0; } 
+//   #endif 
+// #endif
 
 
 void poweroff() {
@@ -198,7 +198,7 @@ int main(void) {
   HAL_ADC_Start(&hadc2);
 
   #ifdef SERIAL_USART2_IT
-  USART2_IT_init();
+  //USART2_IT_init();
   #endif
   #ifdef SERIAL_USART3_IT
   USART3_IT_init();
@@ -220,7 +220,7 @@ int main(void) {
 
   #ifdef CONTROL_SERIAL_USART2
     UART_Control_Init();
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&buffer, 9);
+   // HAL_UART_Receive_DMA(&huart2, (uint8_t *)&buffer, 9);
 
   #endif
 
@@ -246,7 +246,7 @@ int main(void) {
 
     //Control protocol.
     #ifdef CONTROL_SERIAL_USART2
-    //HAL_UART_Receive(&huart2,buffer,sizeof(buffer),10);
+   HAL_UART_Receive(&huart2,buffer,sizeof(buffer),100);
 uint8_t temp_buffer[9];
  memcpy(temp_buffer, buffer, sizeof(buffer));
 //*temp_buffer=&buffer; //Maybe?
