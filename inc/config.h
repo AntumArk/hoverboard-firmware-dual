@@ -81,18 +81,18 @@
 
 // ###### CONTROL VIA UART (serial) ######
 #define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
- #define CONTROL_BAUD 115200
+ #define CONTROL_BAUD 19200
                                       // control via usart from eg an Arduino or raspberry
 // for Arduino, use void loop(void){ Serial.write((uint8_t *) &steer, sizeof(steer)); Serial.write((uint8_t *) &speed, sizeof(speed));delay(20); }
 
 //////////////////////////////////////////////////////////////////
 
 //  #define SERIAL_USART2_IT
-  #define USART2_BAUD       115200                  // UART baud rate
+  #define USART2_BAUD       19200                  // UART baud rate
   #define USART2_WORDLENGTH UART_WORDLENGTH_8B      // UART_WORDLENGTH_8B or UART_WORDLENGTH_9B
 
 // #define SERIAL_USART3_IT
-  #define USART3_BAUD       115200                  // UART baud rate
+  #define USART3_BAUD       19200                  // UART baud rate
   #define USART3_WORDLENGTH UART_WORDLENGTH_8B      // UART_WORDLENGTH_8B or UART_WORDLENGTH_9B
 
   #define SERIAL_USART_IT_BUFFERTYPE  unsigned char // char or short
@@ -123,14 +123,14 @@
 // - speedR and speedL: normal driving -1000 to 1000
 // - weakr and weakl: field weakening for extra boost at high speed (speedR > 700 and speedL > 700). 0 to ~400
 
-#define FILTER              0.02  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
-#define SPEED_COEFFICIENT   0.5  // higher value == stronger. 0.0 to ~2.0?
-#define STEER_COEFFICIENT   -0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
+#define FILTER              0.05  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
+#define SPEED_COEFFICIENT   0.8  // higher value == stronger. 0.0 to ~2.0?
+#define STEER_COEFFICIENT  0.8  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
 #define MAX_VALUE           80
-#define MAX_SPEED           500
+#define MAX_SPEED           700
 #define INVERT_R_DIRECTION
-#define INVERT_L_DIRECTION
-#define BEEPS_BACKWARD 0    // 0 or 1
+//#define INVERT_L_DIRECTION
+#define BEEPS_BACKWARD 1    // 0 or 1
 
 
 #if (INCLUDE_PROTOCOL == NO_PROTOCOL)

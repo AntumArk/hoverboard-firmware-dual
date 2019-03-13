@@ -1,6 +1,11 @@
 #pragma once
 
-#define SERIAL_USART_BUFFER_SIZE 3 // TODO: implement send_wait routine..
+#define SERIAL_USART_BUFFER_SIZE 9 // TODO: implement send_wait routine..
+#define SERIAL_USART_BUFFER_HEAD_SIZE 5 // Header + data bytes
+static uint8_t H1=0xF1;//Header 1
+static uint8_t H2=0xF2;//Header 2
+static uint8_t S1=0xE3;//Stop 1
+static uint8_t S2=0xE4;//Stop 2
 typedef struct tag_serial_usart_buffer {
     SERIAL_USART_IT_BUFFERTYPE buff[SERIAL_USART_BUFFER_SIZE];
     int head; 
@@ -42,7 +47,7 @@ SERIAL_USART_IT_BUFFERTYPE serial_usart_buffer_pop  (volatile SERIAL_USART_BUFFE
 void setScopeChannel(uint8_t ch, int16_t val);
 void consoleScope();
 void consoleLog(char *message);
-
+uint8_t checkMessage(unsigned char *data_p, unsigned short length);
 /////////////////////////////////////////////////////////
 
 

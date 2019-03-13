@@ -61,7 +61,7 @@ typedef struct{
 int scale[2] = {15, 15};
 
 volatile Serialcommand command;
-uint8_t buffer[3];
+uint8_t buffer[9];
    
 enum Mode 
 {
@@ -123,7 +123,7 @@ int milli_vel_error_sum = 0;
 
 
 void poweroff() {
-    if (ABS(speed) < 20) {
+  
         buzzerPattern = 0;
         enable = 0;
         for (int i = 0; i < 8; i++) {
@@ -133,14 +133,16 @@ void poweroff() {
         HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
 
         // if we are powered from sTLink, this bit allows the system to be started again with the button.
-        while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
+        while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
+
+        }
 
         while (1){
           if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
             HAL_NVIC_SystemReset();
           }
         }
-    }
+    
 }
 
 // actually 'power'
@@ -218,7 +220,7 @@ int main(void) {
 
   #ifdef CONTROL_SERIAL_USART2
     UART_Control_Init();
-    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&buffer, 3);
+    HAL_UART_Receive_DMA(&huart2, (uint8_t *)&buffer, 9);
 
   #endif
 
@@ -235,7 +237,8 @@ int main(void) {
 
   while(1) {
     //startup_counter++;
-
+   if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) ) {
+    
 
     cmd1 = 0;
     cmd2 = 0;
@@ -243,22 +246,31 @@ int main(void) {
 
     //Control protocol.
     #ifdef CONTROL_SERIAL_USART2
-    
-    if (buffer[0]=='A'||buffer[0]=='M') {
-     command.mode=buffer[0];
-     command.speed=buffer[1];
-     command.steer=buffer[2];
-    }
-    if (buffer[1]=='A'||buffer[1]=='M') {
-      command.mode=buffer[1];
-     command.speed=buffer[2];
-     command.steer=buffer[0];
-    }
-    if (buffer[2]=='A'||buffer[2]=='M') {
-      command.mode=buffer[2];
-     command.speed=buffer[0];
-     command.steer=buffer[1];
-    }
+    //HAL_UART_Receive(&huart2,buffer,sizeof(buffer),10);
+uint8_t temp_buffer[9];
+ memcpy(temp_buffer, buffer, sizeof(buffer));
+//*temp_buffer=&buffer; //Maybe?
+if(checkMessage(&temp_buffer[0], SERIAL_USART_BUFFER_SIZE))
+ {
+ command.mode=temp_buffer[2];
+     command.speed=temp_buffer[3];
+     command.steer=temp_buffer[4];
+
+    // if (buffer[0]=='A'||buffer[0]=='M') {
+    //  command.mode=buffer[0];
+    //  command.speed=buffer[1];
+    //  command.steer=buffer[2];
+    // }
+    // if (buffer[1]=='A'||buffer[1]=='M') {
+    //   command.mode=buffer[1];
+    //  command.speed=buffer[2];
+    //  command.steer=buffer[0];
+    // }
+    // if (buffer[2]=='A'||buffer[2]=='M') {
+    //   command.mode=buffer[2];
+    //  command.speed=buffer[0];
+    //  command.steer=buffer[1];
+    // }
     
       switch(command.mode)
     {
@@ -284,7 +296,7 @@ int main(void) {
           // cmd2 = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
            cmd1 = speedValue;
           cmd2 = steerValue;
-         
+      //   cmd1=200;
         }
 
          
@@ -292,12 +304,18 @@ int main(void) {
     
 
       timeout = 0;
+ }
+ else
+ {
+  printf("Failed to receive packet");
+ }
+ 
     #endif
-
+//speed=-200;
       // ####### LOW-PASS FILTER #######
       steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
       speed = speed * (1.0 - FILTER) + cmd2 * FILTER;
-
+//steer=200;
 
       // ####### MIXER #######
       pwms[0] = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
@@ -346,14 +364,12 @@ int main(void) {
     }
 
 
-    if (power_button_held){
+    // if (power_button_held){
     
-      // ####### POWEROFF BY POWER-BUTTON #######
-      if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) ) {
-        enable = 0;
-        while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
-        poweroff();
-      }
+    //   // ####### POWEROFF BY POWER-BUTTON #######
+    
+      
+       
     
 
     // if we plug in the charger, keep us alive
@@ -444,9 +460,14 @@ int main(void) {
         poweroff();
       }
     }
+     HAL_Delay(DELAY_IN_MAIN_LOOP);
   }
-  HAL_Delay(DELAY_IN_MAIN_LOOP);
-}}
+ 
+  
+else
+ poweroff();
+  }
+}
 
 /** System Clock Configuration
 */
