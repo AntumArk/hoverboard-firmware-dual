@@ -1,54 +1,22 @@
 #pragma once
-
-#define SERIAL_USART_BUFFER_SIZE 9 // TODO: implement send_wait routine..
+#include "crc.h"
+#define SERIAL_USART_BUFFER_SIZE 9
 #define SERIAL_USART_BUFFER_HEAD_SIZE 5 // Header + data bytes
-static uint8_t H1=0xF1;//Header 1
-static uint8_t H2=0xF2;//Header 2
-static uint8_t S1=0xE3;//Stop 1
-static uint8_t S2=0xE4;//Stop 2
-typedef struct tag_serial_usart_buffer {
-    SERIAL_USART_IT_BUFFERTYPE buff[SERIAL_USART_BUFFER_SIZE];
-    int head; 
-    int tail; 
-    
-    // count of buffer overflows
-    unsigned int overflow;
+//Header 1
+static uint8_t H1 = 0xF1;
+//Header 2
+static uint8_t H2 = 0xF2;
+//Stop 1
+static uint8_t S1 = 0xE3;
+//Stop 2
+static uint8_t S2 = 0xE4;
+//Received packets from USART buffer. May not be correct.
+static uint32_t receivedPackets = 0;
+//Received faulty packets. Headers or CRC does not match.
+static uint32_t faultyPackets = 0;
+//Received packets per 1s
+static uint16_t packetsPerSecond = 0;
 
-} SERIAL_USART_BUFFER;
-
-#if defined(SERIAL_USART2_IT) 
-
-volatile SERIAL_USART_BUFFER usart2_it_TXbuffer;
-volatile SERIAL_USART_BUFFER usart2_it_RXbuffer;
-
-int   USART2_IT_starttx();
-int   USART2_IT_send(unsigned char *data, int len);
-void  USART2_IT_IRQ(USART_TypeDef *us);
-
-#endif
-
-#if defined(SERIAL_USART3_IT) 
-
-volatile SERIAL_USART_BUFFER usart3_it_TXbuffer;
-volatile SERIAL_USART_BUFFER usart3_it_RXbuffer;
-
-int   USART3_IT_starttx();
-int   USART3_IT_send(unsigned char *data, int len);
-void  USART3_IT_IRQ(USART_TypeDef *us);
-
-#endif
-
-int                        serial_usart_buffer_count(volatile SERIAL_USART_BUFFER *usart_buf);
-void                       serial_usart_buffer_push (volatile SERIAL_USART_BUFFER *usart_buf, SERIAL_USART_IT_BUFFERTYPE value);
-SERIAL_USART_IT_BUFFERTYPE serial_usart_buffer_pop  (volatile SERIAL_USART_BUFFER *usart_buf);
-
-
-
-void setScopeChannel(uint8_t ch, int16_t val);
-void consoleScope();
-void consoleLog(char *message);
+//Checks if the message is correct. Start and stop bytes also CRC.
 uint8_t checkMessage(unsigned char *data_p, unsigned short length);
 /////////////////////////////////////////////////////////
-
-
-#define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))

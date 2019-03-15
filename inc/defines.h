@@ -123,7 +123,7 @@
 
 #define DELAY_TIM_FREQUENCY_US 1000000
 
-#define MOTOR_AMP_CONV_DC_AMP 0.02  // A per bit (12) on ADC.
+#define MOTOR_AMP_CONV_DC_AMP 0.02 // A per bit (12) on ADC.
 
 #define MILLI_R (R * 1000)
 #define MILLI_PSI (PSI * 1000)
@@ -146,7 +146,8 @@
 #define MIN3(a, b, c) MIN(a, MIN(b, c))
 #define MAX3(a, b, c) MAX(a, MAX(b, c))
 
-typedef struct {
+typedef struct
+{
   uint16_t rr1;
   uint16_t rr2;
   uint16_t rl1;
