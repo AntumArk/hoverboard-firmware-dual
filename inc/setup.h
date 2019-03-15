@@ -22,9 +22,11 @@
 #pragma once
 
 #include "stm32f1xx_hal.h"
+#include "stm32f1xx.h"
 
 void MX_GPIO_Init(void);
 void MX_TIM_Init(void);
 void MX_ADC1_Init(void);
 void MX_ADC2_Init(void);
 void UART_Control_Init(void);
+void USART1_IRQHandler(void);

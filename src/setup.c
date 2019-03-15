@@ -38,7 +38,11 @@ pb10 usart3 dma1 channel2/3
 #include "defines.h"
 #include "config.h"
 #include "comms.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include "stm32f10x_rcc.h"
+#include "stm32f10x_usart.h"
 TIM_HandleTypeDef htim_right;
 TIM_HandleTypeDef htim_left;
 ADC_HandleTypeDef hadc1;
@@ -46,49 +50,26 @@ ADC_HandleTypeDef hadc2;
 UART_HandleTypeDef huart2;
 
 volatile adc_buf_t adc_buffer;
-
+USART_InitTypeDef USART_InitStructure;
 #ifdef CONTROL_SERIAL_USART2
 
 void UART_Control_Init()
 {
   GPIO_InitTypeDef GPIO_InitStruct;
   __HAL_RCC_USART2_CLK_ENABLE();
-  /* DMA1_Channel6_IRQn interrupt configuration */
-  //HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 5, 6);
-  //HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
-  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 4, 4);
-  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
-  /* DMA1_Channel7_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 5, 7);
-  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
-
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = CONTROL_BAUD;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  // huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  HAL_UART_Init(&huart2);
-
-  __HAL_RCC_DMA1_CLK_ENABLE();
-  /* USER CODE BEGIN USART2_MspInit 0 */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  /* USER CODE END USART2_MspInit 0 */
-  /* Peripheral clock enable */
-  __HAL_RCC_USART2_CLK_ENABLE();
-
-  GPIO_InitStruct.Pull = GPIO_PULLUP; //GPIO_NOPULL;
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT; //GPIO_MODE_AF_PP;
-                                          // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  /* Configure and initialize usart... */
+  USART_InitStructure.BaudRate = 19200;
+  USART_InitStructure.WordLength = USART_WORDLENGTH_8B;
+  USART_InitStructure.StopBits = USART_STOPBITS_1;
+  USART_InitStructure.Parity = USART_Parity_No;
+  USART_InitStructure.HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStructure.Mode = USART_Mode_Rx | USART_Mode_Tx;
+  /* Configure Usart interrupt*/
+  USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+  USART_Init(USART2, &USART_InitStructure);
+  NVIC_EnableIRQ(USART2_IRQn);
+  /* Enable USART2 */
+  USART_Cmd(USART2, ENABLE);
 }
 
 #endif

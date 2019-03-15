@@ -23,13 +23,13 @@ int enablescope = 1;
 
 uint8_t checkMessage(unsigned char *data_p, unsigned short length)
 {
-  unsigned short crc16code = crcu16(&data_p[0], SERIAL_USART_BUFFER_HEAD_SIZE);
+  unsigned short crc16code = crcu16(&data_p[0], BuffSize);
   return (data_p[0] && H1) &&
          (data_p[1] && H2) &&
-         (data_p[SERIAL_USART_BUFFER_HEAD_SIZE + 3] && S1) &&
-         (data_p[SERIAL_USART_BUFFER_HEAD_SIZE + 4] && S2) &&
-         (data_p[SERIAL_USART_BUFFER_HEAD_SIZE + 1] && (unsigned char)(crc16code & 0xFF)) &&
-         (data_p[SERIAL_USART_BUFFER_HEAD_SIZE + 2] && (unsigned char)((crc16code >> 8) & 0xFF));
+         (data_p[headBodySize + 3] && S1) &&
+         (data_p[headBodySize + 4] && S2) &&
+         (data_p[headBodySize + 1] && (unsigned char)(crc16code & 0xFF)) &&
+         (data_p[headBodySize + 2] && (unsigned char)((crc16code >> 8) & 0xFF));
 }
 //////////////////////////////////////////////////////
 //Usart RX interrupt

@@ -1,7 +1,9 @@
 #pragma once
 #include "crc.h"
-#define SERIAL_USART_BUFFER_SIZE 9
-#define SERIAL_USART_BUFFER_HEAD_SIZE 5 // Header + data bytes
+//Transmitted data count
+#define BuffSize 9
+#define headBodySize 5
+#define R_BuffSize 128
 //Header 1
 static uint8_t H1 = 0xF1;
 //Header 2
@@ -16,7 +18,24 @@ static uint32_t receivedPackets = 0;
 static uint32_t faultyPackets = 0;
 //Received packets per 1s
 static uint16_t packetsPerSecond = 0;
-
+volatile uint8_t Receive_Buffer[R_BuffSize];
+volatile static uint8_t *arr_buffer;
+static __IO uint32_t Ticks;
+static __IO uint8_t Uart_it = 0;
+static __IO uint8_t flag_do_command = 0;
+static __IO int32_t R_count = 0;
+static __IO int32_t received_cmd = 0;
+static __IO int32_t received_speed = 0;
+static __IO int32_t received_steer = 0;
+uint8_t logic1 = 0;
+uint8_t logic2 = 0;
+uint16_t ticks_10s = 0;
+volatile uint32_t lost_packets = 0;
+volatile uint32_t lost_packets_per_sec = 0;
+volatile uint32_t lost_packets_count = 0;
+volatile uint32_t lost_packets_stats_count = 0;
+volatile uint32_t sent_packets_count = 0;
+volatile uint32_t received_packets_count = 0;
 //Checks if the message is correct. Start and stop bytes also CRC.
 uint8_t checkMessage(unsigned char *data_p, unsigned short length);
 /////////////////////////////////////////////////////////
