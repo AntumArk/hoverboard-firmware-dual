@@ -420,5 +420,23 @@ void USART1_IRQHandler()
 }
 
 #endif
+
+void SysTick_Handler(void)
+{
+  /* USER CODE BEGIN SysTick_IRQn 0 */
+  ticks_10s++;
+  if (ticks_10s > 10000)
+  {
+    ticks_10s = 0;
+    received_packets_count = 0;
+    sent_packets_count = 0;
+  }
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+  HAL_SYSTICK_IRQHandler();
+  /* USER CODE BEGIN SysTick_IRQn 1 */
+
+  /* USER CODE END SysTick_IRQn 1 */
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
