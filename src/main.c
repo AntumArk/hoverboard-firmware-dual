@@ -18,16 +18,16 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx.h"
-#include "defines.h"
-#include "setup.h"
-#include "config.h"
-#include "comms.h"
+#include "main.h"
 #include "bldc.h"
+#include "comms.h"
+#include "config.h"
+#include "defines.h"
 #include "hallinterrupts.h"
+#include "setup.h"
 #include "softwareserial.h"
+//#include "stm32f1xx.h"
+#include "string.h"
 //#include "hd44780.h"
 #include "pid.h"
 
@@ -38,9 +38,6 @@ extern TIM_HandleTypeDef htim_right;
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern volatile adc_buf_t adc_buffer;
-//LCD_PCF8574_HandleTypeDef lcd;
-extern I2C_HandleTypeDef hi2c2;
-extern UART_HandleTypeDef huart2;
 
 int cmd1; // normalized input values. -1000 to 1000
 int cmd2;
@@ -138,12 +135,12 @@ int dspeeds[2] = {0, 0};
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-  ticks_1s++;
-  if (ticks_1s > 1000)
+  ticks_10s++;
+  if (ticks_10s > 10000)
   {
-    //packetsPerSecond
+    ticks_10s = 0;
     received_packets_count = 0;
-    ticks_1s = 0;
+    sent_packets_count = 0;
   }
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
@@ -152,17 +149,60 @@ void SysTick_Handler(void)
 
   /* USER CODE END SysTick_IRQn 1 */
 }
+#ifdef CONTROL_SERIAL_USART2
+
+void UART_Control_Init()
+{
+  LL_USART_InitTypeDef USART_InitStruct = {0};
+
+  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* Peripheral clock enable */
+  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
+
+  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
+  /**USART2 GPIO Configuration  
+  PA2   ------> USART2_TX
+  PA3   ------> USART2_RX 
+  */
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USART2 interrupt Init */
+  NVIC_SetPriority(USART2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+  NVIC_EnableIRQ(USART2_IRQn);
+
+  USART_InitStruct.BaudRate = 19200;
+  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
+  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
+  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
+  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
+  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
+  LL_USART_Init(USART2, &USART_InitStruct);
+  LL_USART_ConfigAsyncMode(USART2);
+  LL_USART_Enable(USART2);
+}
+
 void USART1_IRQHandler()
 {
+  /* USER CODE BEGIN USART1_IRQn 0 */
 
+  //GPIO_ToggleBit(GPIOA,GPIO_Pin_7);
   int8_t i = 0, found = 0, crc16_1, crc16_2;
 
-  while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE))
+  while (LL_USART_IsActiveFlag_RXNE(USART1))
   {
     {
       flag_do_command = 0;
-      Receive_Buffer[R_count] = USART_ReceiveData(USART1);
+      Receive_Buffer[R_count] = LL_USART_ReceiveData8(USART1);
       R_count++;
+      //LL_USART_ClearFlag_RXNE(USART1);
       if (R_count >= R_BuffSize)
       {
         R_count = 0;
@@ -205,20 +245,13 @@ void USART1_IRQHandler()
     if (found)
     {
       received_packets_count++;
-      // if (logic2)
-      // {
-      //   logic2 = 0;
-      //   GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-      // }
-      // else
-      // {
-      //   logic2 = 1;
-      //   GPIO_SetBits(GPIOC, GPIO_Pin_13);
-      // }
+      HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
       flag_do_command = 1;
     }
   }
 }
+
+#endif
 int main(void)
 {
   char tmp[200];
@@ -297,11 +330,11 @@ int main(void)
 
 //Control protocol.
 #ifdef CONTROL_SERIAL_USART2
-      HAL_UART_Receive(&huart2, buffer, sizeof(buffer), 100);
+      // HAL_UART_Receive(&huart2, buffer, sizeof(buffer), 100);
       uint8_t temp_buffer[9];
       memcpy(temp_buffer, buffer, sizeof(buffer));
       //*temp_buffer=&buffer; //Maybe?
-      if (checkMessage(&temp_buffer[0], headBodySize))
+      if (checkMessage(&temp_buffer[0], 5))
       {
         command.mode = temp_buffer[2];
         command.speed = temp_buffer[3];

@@ -41,38 +41,14 @@ pb10 usart3 dma1 channel2/3
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "stm32f10x_rcc.h"
-#include "stm32f10x_usart.h"
+#include "main.h"
+
 TIM_HandleTypeDef htim_right;
 TIM_HandleTypeDef htim_left;
 ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc2;
-UART_HandleTypeDef huart2;
 
 volatile adc_buf_t adc_buffer;
-USART_InitTypeDef USART_InitStructure;
-#ifdef CONTROL_SERIAL_USART2
-
-void UART_Control_Init()
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  __HAL_RCC_USART2_CLK_ENABLE();
-  /* Configure and initialize usart... */
-  USART_InitStructure.BaudRate = 19200;
-  USART_InitStructure.WordLength = USART_WORDLENGTH_8B;
-  USART_InitStructure.StopBits = USART_STOPBITS_1;
-  USART_InitStructure.Parity = USART_Parity_No;
-  USART_InitStructure.HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.Mode = USART_Mode_Rx | USART_Mode_Tx;
-  /* Configure Usart interrupt*/
-  USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-  USART_Init(USART2, &USART_InitStructure);
-  NVIC_EnableIRQ(USART2_IRQn);
-  /* Enable USART2 */
-  USART_Cmd(USART2, ENABLE);
-}
-
-#endif
 
 void MX_GPIO_Init(void)
 {
