@@ -55,8 +55,6 @@ int scale[2] = {15, 15};
 volatile Serialcommand command;
 uint8_t buffer[9];
 
-static uint16_t ticks_1s = 0;
-
 enum Mode
 {
   MANUAL_MODE = 0,
@@ -149,112 +147,8 @@ void SysTick_Handler(void)
 
   /* USER CODE END SysTick_IRQn 1 */
 }
-#ifdef CONTROL_SERIAL_USART2
-
-void UART_Control_Init()
-{
-  LL_USART_InitTypeDef USART_InitStruct = {0};
-
-  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* Peripheral clock enable */
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
-
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOA);
-  /**USART2 GPIO Configuration  
-  PA2   ------> USART2_TX
-  PA3   ------> USART2_RX 
-  */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_2;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_3;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* USART2 interrupt Init */
-  NVIC_SetPriority(USART2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-  NVIC_EnableIRQ(USART2_IRQn);
-
-  USART_InitStruct.BaudRate = 19200;
-  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
-  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
-  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
-  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
-  LL_USART_Init(USART2, &USART_InitStruct);
-  LL_USART_ConfigAsyncMode(USART2);
-  LL_USART_Enable(USART2);
-}
-
-void USART1_IRQHandler()
-{
-  /* USER CODE BEGIN USART1_IRQn 0 */
-
-  //GPIO_ToggleBit(GPIOA,GPIO_Pin_7);
-  int8_t i = 0, found = 0, crc16_1, crc16_2;
-
-  while (LL_USART_IsActiveFlag_RXNE(USART1))
-  {
-    {
-      flag_do_command = 0;
-      Receive_Buffer[R_count] = LL_USART_ReceiveData8(USART1);
-      R_count++;
-      //LL_USART_ClearFlag_RXNE(USART1);
-      if (R_count >= R_BuffSize)
-      {
-        R_count = 0;
-        continue;
-      }
-    }
-    found = 0;
-    for (i = R_count - 1; i >= 8; i--)
-    {
-      if ((Receive_Buffer[i - 8] == 0xF1) && (Receive_Buffer[i - 7] == 0xF2) && (Receive_Buffer[i - 1] == 0xE3) && (Receive_Buffer[i] == 0xE4))
-      {
-        received_cmd = Receive_Buffer[i - 6];
-        if ((received_cmd == 0x41) || (received_cmd == 0x4d))
-        {
-          received_speed = Receive_Buffer[i - 5];
-          received_steer = Receive_Buffer[i - 4];
-          // TODO: sudet apsaugas ir nesetint found = 1, jei apsaugos pazeistos
-          //Recreate temporary buffer
-          uint8_t temp_Buffer[5] = {Receive_Buffer[i - 8], Receive_Buffer[i - 7], Receive_Buffer[i - 6], Receive_Buffer[i - 5], Receive_Buffer[i - 4]};
-          unsigned short crc16code = crcu16((uint8_t *)&temp_Buffer[0], 5);
-
-          crc16_1 = Receive_Buffer[i - 3];
-          crc16_2 = Receive_Buffer[i - 2];
-          unsigned char my_crc16_1 = (unsigned char)(crc16code & 0xFF);
-          unsigned char my_crc16_2 = (unsigned char)((crc16code >> 8) & 0xFF);
-          uint8_t firstByteTrue = (unsigned char)my_crc16_1 == (unsigned char)crc16_1;
-          uint8_t secondByteTrue = (unsigned char)my_crc16_2 == (unsigned char)crc16_2;
-          if (firstByteTrue && secondByteTrue) //&&(my_crc16_2==crc16_2))
-          {
-            //TODO: check the CRC both bytes
-            R_count = 0;
-            // If all passed
-            found = 1;
-          }
-        }
-      }
-      if (found)
-        break;
-    }
-    if (found)
-    {
-      received_packets_count++;
-      HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
-      flag_do_command = 1;
-    }
-  }
-}
-
-#endif
 int main(void)
 {
-  char tmp[200];
   HAL_Init();
   __HAL_RCC_AFIO_CLK_ENABLE();
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
@@ -314,11 +208,6 @@ int main(void)
 
   enable = 1; // enable motors
 
-  // ####### POWEROFF BY POWER-BUTTON #######
-  int power_button_held = HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
-
-  unsigned int startup_counter = 0;
-
   while (1)
   {
     //startup_counter++;
@@ -330,65 +219,39 @@ int main(void)
 
 //Control protocol.
 #ifdef CONTROL_SERIAL_USART2
-      // HAL_UART_Receive(&huart2, buffer, sizeof(buffer), 100);
-      uint8_t temp_buffer[9];
-      memcpy(temp_buffer, buffer, sizeof(buffer));
-      //*temp_buffer=&buffer; //Maybe?
-      if (checkMessage(&temp_buffer[0], 5))
+
+      command.mode = received_cmd;
+      command.speed = received_speed;
+      command.steer = received_steer;
+
+      switch (command.mode)
       {
-        command.mode = temp_buffer[2];
-        command.speed = temp_buffer[3];
-        command.steer = temp_buffer[4];
-
-        // if (buffer[0]=='A'||buffer[0]=='M') {
-        //  command.mode=buffer[0];
-        //  command.speed=buffer[1];
-        //  command.steer=buffer[2];
-        // }
-        // if (buffer[1]=='A'||buffer[1]=='M') {
-        //   command.mode=buffer[1];
-        //  command.speed=buffer[2];
-        //  command.steer=buffer[0];
-        // }
-        // if (buffer[2]=='A'||buffer[2]=='M') {
-        //   command.mode=buffer[2];
-        //  command.speed=buffer[0];
-        //  command.steer=buffer[1];
-        // }
-
-        switch (command.mode)
-        {
-        case 'M':
-          mode = MANUAL_MODE;
-          break;
-        case 'A':
-          mode = AUTOMATIC_MODE;
-          cmd1 = 0;
-          cmd2 = 0;
-          break;
-        }
-
-        if (mode == MANUAL_MODE)
-        {
-          speedValue = command.speed - MAX_VALUE / 2;
-          speedValue *= MAX_SPEED;
-          speedValue /= (MAX_VALUE / 2);
-          steerValue = command.steer - MAX_VALUE / 2;
-          steerValue *= MAX_SPEED;
-          steerValue /= (MAX_VALUE / 2);
-          //  cmd1 = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
-          // cmd2 = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
-          cmd1 = speedValue;
-          cmd2 = steerValue;
-          //   cmd1=200;
-        }
-
-        timeout = 0;
+      case 'M':
+        mode = MANUAL_MODE;
+        break;
+      case 'A':
+        mode = AUTOMATIC_MODE;
+        cmd1 = 0;
+        cmd2 = 0;
+        break;
       }
-      else
+
+      if (mode == MANUAL_MODE)
       {
-        printf("Failed to receive packet");
+        speedValue = command.speed - MAX_VALUE / 2;
+        speedValue *= MAX_SPEED;
+        speedValue /= (MAX_VALUE / 2);
+        steerValue = command.steer - MAX_VALUE / 2;
+        steerValue *= MAX_SPEED;
+        steerValue /= (MAX_VALUE / 2);
+        //  cmd1 = CLAMP(speedValue * SPEED_COEFFICIENT -  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+        // cmd2 = CLAMP(speedValue * SPEED_COEFFICIENT +  steerValue * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+        cmd1 = speedValue;
+        cmd2 = steerValue;
+        //   cmd1=200;
       }
+
+      timeout = 0;
 
 #endif
       //speed=-200;
@@ -398,12 +261,9 @@ int main(void)
       //steer=200;
 
       // ####### MIXER #######
-      pwms[0] = CLAMP(speed * SPEED_COEFFICIENT - steer * STEER_COEFFICIENT, -1000, 1000);
-      pwms[1] = CLAMP(speed * SPEED_COEFFICIENT + steer * STEER_COEFFICIENT, -1000, 1000);
+      pwms[0] = CLAMP(speed * SPEED_COEFFICIENT - steer * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
+      pwms[1] = CLAMP(speed * SPEED_COEFFICIENT + steer * STEER_COEFFICIENT, -MAX_SPEED, MAX_SPEED);
 
-#ifdef ADDITIONAL_CODE
-      ADDITIONAL_CODE;
-#endif
 #ifdef INVERT_R_DIRECTION
       pwmr = pwms[1];
 #else

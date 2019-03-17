@@ -15,7 +15,6 @@ static volatile uint8_t PosX = 0;
 static volatile uint8_t PosY = 0;
 static volatile uint8_t Mode = 0;
 static volatile uint8_t Receive_Buffer[R_BuffSize];
-volatile static uint8_t *arr_buffer;
 static __IO uint32_t Ticks;
 static __IO uint8_t flag_do_command = 0;
 static __IO int32_t R_count = 0;

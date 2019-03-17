@@ -31,13 +31,14 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx.h"
 #include "stm32f1xx_it.h"
+#include "comms.h"
 #include "config.h"
 #include "hallinterrupts.h"
+#include "main.h"
 #include "softwareserial.h"
-
+#include "stm32f1xx.h"
+#include "stm32f1xx_hal.h"
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -348,5 +349,76 @@ void EXTI15_10_IRQHandler(void)
 
 /* USER CODE BEGIN 1 */
 
+#ifdef CONTROL_SERIAL_USART2
+
+void USART1_IRQHandler()
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+
+  //GPIO_ToggleBit(GPIOA,GPIO_Pin_7);
+  int8_t i = 0, found = 0, crc16_1, crc16_2;
+
+  while (LL_USART_IsActiveFlag_RXNE(USART1))
+  {
+    {
+      flag_do_command = 0;
+      Receive_Buffer[R_count] = LL_USART_ReceiveData8(USART1);
+      R_count++;
+      //LL_USART_ClearFlag_RXNE(USART1);
+      if (R_count >= R_BuffSize)
+      {
+        R_count = 0;
+        continue;
+      }
+    }
+    found = 0;
+    for (i = R_count - 1; i >= 8; i--)
+    {
+      if ((Receive_Buffer[i - 8] == 0xF1) && (Receive_Buffer[i - 7] == 0xF2) && (Receive_Buffer[i - 1] == 0xE3) && (Receive_Buffer[i] == 0xE4))
+      {
+        received_cmd = Receive_Buffer[i - 6];
+        if ((received_cmd == 0x41) || (received_cmd == 0x4d))
+        {
+          received_speed = Receive_Buffer[i - 5];
+          received_steer = Receive_Buffer[i - 4];
+          // TODO: sudet apsaugas ir nesetint found = 1, jei apsaugos pazeistos
+          //Recreate temporary buffer
+          uint8_t temp_Buffer[5] = {Receive_Buffer[i - 8], Receive_Buffer[i - 7], Receive_Buffer[i - 6], Receive_Buffer[i - 5], Receive_Buffer[i - 4]};
+          unsigned short crc16code = crcu16((uint8_t *)&temp_Buffer[0], 5);
+
+          crc16_1 = Receive_Buffer[i - 3];
+          crc16_2 = Receive_Buffer[i - 2];
+          unsigned char my_crc16_1 = (unsigned char)(crc16code & 0xFF);
+          unsigned char my_crc16_2 = (unsigned char)((crc16code >> 8) & 0xFF);
+          uint8_t firstByteTrue = (unsigned char)my_crc16_1 == (unsigned char)crc16_1;
+          uint8_t secondByteTrue = (unsigned char)my_crc16_2 == (unsigned char)crc16_2;
+          if (firstByteTrue && secondByteTrue) //&&(my_crc16_2==crc16_2))
+          {
+            //TODO: check the CRC both bytes
+            R_count = 0;
+            // If all passed
+            found = 1;
+          }
+        }
+      }
+      if (found)
+        break;
+    }
+    if (found)
+    {
+      received_packets_count++;
+      HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
+      flag_do_command = 1;
+    }
+    else
+    {
+      received_cmd = 0;
+      received_speed = 0;
+      received_steer = 0;
+    }
+  }
+}
+
+#endif
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
