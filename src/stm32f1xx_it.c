@@ -40,7 +40,10 @@
 #include "stm32f1xx.h"
 #include "stm32f1xx_hal.h"
 /* USER CODE BEGIN 0 */
-
+void Unhandled_Handler()
+{
+  asm volatile("bkpt #1");
+}
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/

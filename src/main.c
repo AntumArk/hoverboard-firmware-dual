@@ -110,14 +110,14 @@ void poweroff()
   while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
   {
   }
-
+  /*
   while (1)
   {
     if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN))
     {
       HAL_NVIC_SystemReset();
     }
-  }
+  }*/
 }
 
 // actually 'power'
